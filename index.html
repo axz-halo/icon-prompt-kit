@@ -250,8 +250,10 @@
     position: absolute; right: 8px; bottom: 8px; opacity: 0;
     background: rgba(14,14,16,0.72); color: #fff; border: 0; border-radius: 7px;
     padding: 5px 10px; font-size: 11px; font-weight: 700; text-decoration: none;
+    cursor: pointer;
   }
-  .gtile:hover .dl { opacity: 1; }
+  .gtile:hover .dl, .gtile:focus-within .dl { opacity: 1; }
+  .gtile .keep:hover { background: var(--ok); }
   .gen-prompt {
     margin-top: 12px; display: flex; gap: 10px; align-items: stretch;
   }
@@ -337,6 +339,7 @@
         <div class="actions" style="margin-top:0">
           <a class="btn ghost" id="d-dl-svg" download>SVG 다운로드</a>
           <a class="btn ghost" id="d-dl-png" download>PNG 다운로드</a>
+          <button class="btn ghost" id="d-unarchive" style="display:none">보관 해제</button>
         </div>
       </div>
     </div>
@@ -393,17 +396,41 @@
 <script>
 const { SETS, CORE_MJ, CORE_HF } = window.DGG_DATA;
 
-const ITEMS = [];
-SETS.forEach((set) => {
-  set.items.forEach((it) => {
-    ITEMS.push({
-      set: set.id, setName: set.name, color: set.color,
-      ko: it.ko, en: it.en, body: it.body,
-      png: it.png, svg: it.svg,
-      img: it.svg || it.png,
+const svgToUrl = (svg) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+
+/* ── 아카이브 (무드 유지 저장소, localStorage) ── */
+const ARCHIVE_KEY = "dgg-archive-v1";
+function loadArchive() {
+  try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY)) || []; } catch { return []; }
+}
+function saveArchive() {
+  try { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE)); } catch { /* quota */ }
+}
+let ARCHIVE = loadArchive();
+
+let ITEMS = [];
+function buildItems() {
+  ITEMS = [];
+  SETS.forEach((set) => {
+    set.items.forEach((it) => {
+      ITEMS.push({
+        set: set.id, setName: set.name, color: set.color,
+        ko: it.ko, en: it.en, body: it.body,
+        png: it.png, svg: it.svg, svgText: null,
+        img: it.svg || it.png,
+      });
     });
   });
-});
+  ARCHIVE.forEach((a) => {
+    ITEMS.push({
+      set: "archive", setName: "Archive", color: "#3BA55D",
+      ko: a.ko, en: a.en, body: a.body,
+      png: null, svg: null, svgText: a.svg,
+      img: svgToUrl(a.svg), archiveId: a.id,
+    });
+  });
+}
+buildItems();
 
 let mode = "mj";
 let tab = "all";
@@ -437,6 +464,7 @@ function renderTabs() {
   const defs = [{ id: "all", name: "전체", n: ITEMS.length }].concat(
     SETS.map((s) => ({ id: s.id, name: s.name, n: s.items.length }))
   );
+  if (ARCHIVE.length > 0) defs.push({ id: "archive", name: "Archive", n: ARCHIVE.length });
   tabsEl.innerHTML = "";
   defs.forEach((d) => {
     const b = document.createElement("button");
@@ -445,6 +473,23 @@ function renderTabs() {
     b.addEventListener("click", () => { tab = d.id; renderTabs(); renderGrid(); });
     tabsEl.appendChild(b);
   });
+  if (ARCHIVE.length > 0) {
+    const ex = document.createElement("button");
+    ex.className = "tab";
+    ex.style.marginLeft = "auto";
+    ex.textContent = "보관함 내보내기 ↓";
+    ex.title = "아카이브를 JSON으로 내려받아 정식 세트(data.js) 편입 요청에 사용하세요";
+    ex.addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(ARCHIVE, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "dgg-archive.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast("보관함 JSON을 내려받았어요 — 정식 세트 편입 요청에 첨부하세요");
+    });
+    tabsEl.appendChild(ex);
+  }
 }
 
 /* 그리드 */
@@ -517,9 +562,10 @@ function openDetail(idx) {
   const base = it.en.replace(/\s+/g, "-");
   const dlSvg = document.getElementById("d-dl-svg");
   const dlPng = document.getElementById("d-dl-png");
-  if (it.svg) {
+  const svgHref = it.svg || (it.svgText ? svgToUrl(it.svgText) : null);
+  if (svgHref) {
     dlSvg.style.display = "";
-    dlSvg.href = it.svg;
+    dlSvg.href = svgHref;
     dlSvg.setAttribute("download", `${base}.svg`);
   } else {
     dlSvg.style.display = "none";
@@ -531,6 +577,18 @@ function openDetail(idx) {
   } else {
     dlPng.style.display = "none";
   }
+  const unBtn = document.getElementById("d-unarchive");
+  unBtn.style.display = it.set === "archive" ? "" : "none";
+  unBtn.onclick = () => {
+    ARCHIVE = ARCHIVE.filter((a) => a.id !== it.archiveId);
+    saveArchive();
+    buildItems();
+    dOv.classList.remove("open");
+    if (ARCHIVE.length === 0 && tab === "archive") tab = "all";
+    renderTabs();
+    renderGrid();
+    showToast("보관함에서 제거했어요");
+  };
   dOv.classList.add("open");
 }
 function step(d) {
@@ -588,41 +646,51 @@ document.getElementById("q").addEventListener("input", (e) => {
 /* ── 생성 섹션 ── */
 const genInput = document.getElementById("gen-q");
 const genResults = document.getElementById("gen-results");
-let genState = null; // {kw, gens[], sel, matched}
-
-const svgToUrl = (svg) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+let genState = null; // {kw, gens[], sel, matched, motif}
 
 function findMatch(kw) {
   const k = kw.toLowerCase();
   return (
-    ITEMS.find((it) => it.ko === kw || it.en.toLowerCase() === k) ||
-    ITEMS.find((it) => it.ko.includes(kw) || it.en.toLowerCase().includes(k)) ||
+    ITEMS.find((it) => it.set !== "archive" && (it.ko === kw || it.en.toLowerCase() === k)) ||
+    ITEMS.find((it) => it.set !== "archive" && (it.ko.includes(kw) || it.en.toLowerCase().includes(k))) ||
     null
   );
+}
+
+function archiveAdd(g, kw) {
+  const id = `ar-${Date.now().toString(36)}-${(g.seed >>> 0).toString(36)}`;
+  ARCHIVE.unshift({ id, ko: kw, en: g.motif || kw, body: g.body, svg: g.svg, createdAt: Date.now() });
+  saveArchive();
+  buildItems();
+  renderTabs();
+  renderGrid();
+  showToast("보관함에 추가했어요 — Archive 탭에 무드가 축적돼요");
 }
 
 function runGenerate(kw, reseed) {
   const keyword = kw.trim();
   if (!keyword) { genInput.focus(); return; }
   const baseSeed = reseed ? Math.floor(Math.random() * 2 ** 31) : window.DGG_ENGINE.hash(keyword) ^ 0x9e3779b9;
-  const gens = [0, 1, 2, 3].map((i) => {
-    const g = window.DGG_ENGINE.generate(keyword, baseSeed + i * 7919);
-    return { ...g, body: window.DGG_ENGINE.buildBody(keyword, g) };
-  });
-  genState = { kw: keyword, gens, sel: 0, matched: findMatch(keyword) };
+  const gens = [0, 1, 2, 3].map((i) => window.DGG_ENGINE.generate(keyword, baseSeed + i * 7919));
+  const res = window.DGG_ENGINE.resolve(keyword);
+  genState = {
+    kw: keyword, gens, sel: 0,
+    matched: findMatch(keyword),
+    motif: res.type === "motif" ? res.id : null,
+  };
   renderGen();
   genResults.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function renderGen() {
   if (!genState) { genResults.innerHTML = ""; return; }
-  const { kw, gens, sel, matched } = genState;
+  const { kw, gens, sel, matched, motif } = genState;
   const selGen = gens[sel];
   genResults.innerHTML = `
     <div class="gen-panel">
       <div class="gen-head">
         <h3>“${kw}” 생성 결과</h3>
-        <span class="sub">스타일 문법 기반 무드 프리뷰 · 타일 선택 시 프롬프트 갱신</span>
+        <span class="sub">${motif ? `✓ 모티프 인식됨 (${motif}) — 실제 형태로 생성` : "미등록 주제 — 무드 스케치 폴백"} · 타일 선택 시 프롬프트 갱신</span>
         <button class="re" id="gen-re">↻ 다시 생성</button>
         <button class="re" id="gen-close">닫기</button>
       </div>
@@ -632,27 +700,34 @@ function renderGen() {
         </div>` : ""}
       <div class="gen-tiles">
         ${matched ? `
-          <button class="gtile" id="gen-ref" aria-label="레퍼런스 보기">
+          <div class="gtile" id="gen-ref" role="button" tabindex="0" aria-label="레퍼런스 보기">
             <span class="tag">레퍼런스</span>
             <img src="${matched.img}" alt="${matched.ko} 레퍼런스">
-          </button>` : ""}
+          </div>` : ""}
         ${gens.map((g, i) => `
-          <button class="gtile ${i === sel ? "sel" : ""}" data-i="${i}" aria-label="변형 ${i + 1} 선택">
+          <div class="gtile ${i === sel ? "sel" : ""}" data-i="${i}" role="button" tabindex="0" aria-label="변형 ${i + 1} 선택">
             <span class="tag">V${i + 1} · ${(g.seed >>> 0).toString(16).slice(0, 5)}</span>
             <img src="${svgToUrl(g.svg)}" alt="${kw} 생성 변형 ${i + 1}">
+            <span class="dl keep" role="button" tabindex="0" data-k="${i}" style="right:66px">보관</span>
             <a class="dl" download="${kw.replace(/\s+/g, "-")}-v${i + 1}.svg" href="${svgToUrl(g.svg)}">SVG</a>
-          </button>`).join("")}
+          </div>`).join("")}
       </div>
       <div class="gen-prompt">
         <div class="prompt-box"><b>${selGen.body.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</b><br><span style="opacity:0.55">${(mode === "mj" ? CORE_MJ : CORE_HF).slice(2)}</span></div>
         <button class="btn primary" id="gen-copy">프롬프트 복사</button>
       </div>
-      <div class="gen-note">프리뷰는 무드 확인용 스케치예요 — 고품질 결과물은 위 프롬프트를 미드저니/힉스필드에 붙여넣어 생성하세요. 마음에 드는 변형은 SVG로 바로 내려받을 수 있어요.</div>
+      <div class="gen-note">마음에 드는 변형은 [보관]으로 Archive 탭에 축적하세요 — 갤러리·검색·다운로드에 함께 잡히고, [보관함 내보내기]로 정식 세트 편입을 요청할 수 있어요. 고품질 결과물은 프롬프트를 미드저니/힉스필드에 붙여넣어 생성하세요.</div>
     </div>`;
 
   document.getElementById("gen-re").addEventListener("click", () => runGenerate(kw, true));
   document.getElementById("gen-close").addEventListener("click", () => { genState = null; renderGen(); });
   document.getElementById("gen-copy").addEventListener("click", () => copyText(selGen.body + (mode === "mj" ? CORE_MJ : CORE_HF)));
+  genResults.querySelectorAll(".gtile .keep").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      archiveAdd(gens[Number(b.dataset.k)], kw);
+    });
+  });
   genResults.querySelectorAll(".gtile[data-i]").forEach((t) => {
     t.addEventListener("click", (e) => {
       if (e.target.closest(".dl")) return;
