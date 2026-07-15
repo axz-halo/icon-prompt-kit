@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="flat" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g>
+	<path fill="#F2C500" d="M16,32C7.178,32,0,24.822,0,16S7.178,0,16,0s16,7.178,16,16S24.822,32,16,32z"/>
+</g>
+<g>
+	<path fill="#EBEBEB" d="M26.21,9.7L16,16l10.21,6.3C27.35,20.47,28,18.31,28,16S27.35,11.53,26.21,9.7z"/>
+</g>
+<g>
+	<path fill="#F59D00" d="M4,16c0,2.31,0.65,4.47,1.79,6.3L16,16L5.79,9.7C4.65,11.53,4,13.69,4,16z"/>
+</g>
+<g>
+	<path fill="#F59D00" d="M16,4v12l10.21-6.3C24.09,6.28,20.31,4,16,4z"/>
+</g>
+<g>
+	<path fill="#F59D00" d="M16,16v12c4.31,0,8.09-2.28,10.21-5.7L16,16z"/>
+</g>
+<g>
+	<path fill="#EBEBEB" d="M5.79,22.3C7.91,25.72,11.69,28,16,28V16L5.79,22.3z"/>
+</g>
+<g>
+	<path fill="#EBEBEB" d="M5.79,9.7L16,16V4C11.69,4,7.91,6.28,5.79,9.7z"/>
+</g>
+<g>
+	<path fill="#F2C500" d="M16,20c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S18.206,20,16,20z"/>
+</g>
+</svg>

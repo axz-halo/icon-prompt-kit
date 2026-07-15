@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRIDA Icons — 아이콘 재현 프롬프트 갤러리</title>
+<title>Daum Graphic Generator — 아이콘 프롬프트 갤러리</title>
 <style>
   :root {
     --bg: #0E0E10;
@@ -191,6 +191,7 @@
   .btn.primary:hover { background: #fff; }
   .btn.ghost { background: var(--panel-2); color: var(--ink-2); border: 1px solid var(--line-2); }
   .btn.ghost:hover { color: var(--ink); }
+  a.btn { text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 13px; }
   .modehint { font-size: 11px; color: var(--ink-3); }
 
   .guide-body { padding: 18px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
@@ -223,7 +224,7 @@
 <body>
 
 <div class="topbar">
-  <div class="logo"><b>GRIDA Icons</b><span>Prompt Gallery · 75</span></div>
+  <div class="logo"><b>Daum Graphic Generator</b><span>Icon Prompt Gallery</span></div>
   <div class="search">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="아이콘·프롬프트 검색 (예: 수박, chili, cyan)" aria-label="검색">
@@ -263,6 +264,10 @@
         <div class="actions">
           <button class="btn primary" id="d-copy">프롬프트 복사</button>
           <button class="btn ghost" id="d-copy-core">코어만 복사</button>
+        </div>
+        <div class="actions" style="margin-top:0">
+          <a class="btn ghost" id="d-dl-svg" download>SVG 다운로드</a>
+          <a class="btn ghost" id="d-dl-png" download>PNG 다운로드</a>
         </div>
       </div>
     </div>
@@ -316,12 +321,17 @@
 
 <script src="data.js"></script>
 <script>
-const { SETS, CORE_MJ, CORE_HF } = window.GRIDA_DATA;
+const { SETS, CORE_MJ, CORE_HF } = window.DGG_DATA;
 
 const ITEMS = [];
 SETS.forEach((set) => {
   set.items.forEach((it) => {
-    ITEMS.push({ set: set.id, setName: set.name, color: set.color, ko: it.ko, en: it.en, body: it.body, img: `img/${set.id}/${it.file}` });
+    ITEMS.push({
+      set: set.id, setName: set.name, color: set.color,
+      ko: it.ko, en: it.en, body: it.body,
+      png: it.png, svg: it.svg,
+      img: it.svg || it.png,
+    });
   });
 });
 
@@ -424,7 +434,7 @@ function openDetail(idx) {
     `<b>${escapeHtml(it.body)}</b><br><span style="opacity:0.55">${escapeHtml((mode === "mj" ? CORE_MJ : CORE_HF).slice(2))}</span>`;
   const chips = document.getElementById("d-chips");
   chips.innerHTML = "";
-  (it.body.match(/#[0-9A-Fa-f]{6}/g) || []).forEach((hex) => {
+  [...new Set((it.body.match(/#[0-9A-Fa-f]{6}/g) || []).map((h) => h.toUpperCase()))].forEach((hex) => {
     const c = document.createElement("button");
     c.className = "chip";
     c.innerHTML = `<b style="background:${hex}"></b>${hex.toUpperCase()}`;
@@ -433,6 +443,24 @@ function openDetail(idx) {
   });
   document.getElementById("d-hint").textContent =
     mode === "mj" ? "복사 시 미드저니 완성형(파라미터 포함)으로 복사됩니다" : "복사 시 힉스필드용 서술형(파라미터 없음)으로 복사됩니다";
+  // 다운로드 (download 속성으로 정명 파일명 보정 — 원본 PNG 파일명 셔플 대응)
+  const base = it.en.replace(/\s+/g, "-");
+  const dlSvg = document.getElementById("d-dl-svg");
+  const dlPng = document.getElementById("d-dl-png");
+  if (it.svg) {
+    dlSvg.style.display = "";
+    dlSvg.href = it.svg;
+    dlSvg.setAttribute("download", `${base}.svg`);
+  } else {
+    dlSvg.style.display = "none";
+  }
+  if (it.png) {
+    dlPng.style.display = "";
+    dlPng.href = it.png;
+    dlPng.setAttribute("download", `${base}.png`);
+  } else {
+    dlPng.style.display = "none";
+  }
   dOv.classList.add("open");
 }
 function step(d) {
