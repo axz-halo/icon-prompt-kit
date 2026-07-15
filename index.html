@@ -359,7 +359,7 @@
       <label class="chk"><input type="checkbox" id="api-mock"> 테스트 모드 (X-Mock: 1) — 실제 LLM 호출 없이 연동 검증</label>
     </div>
     <div class="api-row api-actions">
-      <span class="api-note">키는 이 브라우저(localStorage)에만 저장돼요 · stg 라우터는 브라우저 직접 호출(CORS)을 아직 허용하지 않아요 — 저장소의 <b>proxy.py</b>를 실행하고 라우터 주소를 <b>http://localhost:8787/v1</b>로 바꾸면 동작해요 · 현재 크레딧 차감 없음</span>
+      <span class="api-note" id="api-note">키는 이 브라우저(localStorage)에만 저장돼요 · stg 라우터는 브라우저 직접 호출(CORS)을 아직 허용하지 않아요 — 저장소의 <b>proxy.py</b>를 실행하면 라우터 주소가 자동 설정돼요 · 현재 크레딧 차감 없음</span>
       <button class="re" id="api-save">저장</button>
       <button class="re" id="api-clear">키 삭제</button>
     </div>
@@ -735,7 +735,7 @@ modelSel.value = localStorage.getItem(MODEL_STORE) || "local";
 modelSel.addEventListener("change", () => {
   localStorage.setItem(MODEL_STORE, modelSel.value);
   updateKeyBadge();
-  if (modelSel.value !== "local" && !getApiKey()) apiPanel.classList.add("open");
+  if (modelSel.value !== "local" && !getApiKey() && !isLocalProxy()) apiPanel.classList.add("open");
 });
 
 const apiPanel = document.getElementById("api-panel");
@@ -743,12 +743,18 @@ const keyInput = document.getElementById("api-key-input");
 const mockChk = document.getElementById("api-mock");
 const cogBtn = document.getElementById("gen-key");
 const getApiKey = () => localStorage.getItem(KEY_STORE) || "";
+const isLocalProxy = () => /^https?:\/\/(localhost|127\.0\.0\.1)/.test(getRouterBase());
 function updateKeyBadge() {
-  cogBtn.classList.toggle("warn", modelSel.value !== "local" && !getApiKey());
+  cogBtn.classList.toggle("warn", modelSel.value !== "local" && !getApiKey() && !isLocalProxy());
 }
 const baseInput = document.getElementById("api-base-input");
 keyInput.value = getApiKey();
 baseInput.value = localStorage.getItem(BASE_STORE) || "";
+baseInput.placeholder = `비워두면 자동: ${getRouterBase()}`;
+if (isLocalProxy()) {
+  document.getElementById("api-note").innerHTML =
+    "✓ <b>로컬 실행기 사용 중</b> — 라우터 주소는 자동이고, proxy.py 옆에 <b>timely.key</b> 파일이 있으면 키도 자동 주입돼요. 이 패널은 개인 키로 덮어쓸 때만 쓰세요.";
+}
 mockChk.checked = localStorage.getItem(MOCK_STORE) === "1";
 cogBtn.addEventListener("click", () => apiPanel.classList.toggle("open"));
 document.getElementById("api-save").addEventListener("click", () => {
@@ -809,9 +815,9 @@ function sanitizeSvg(s) {
 
 async function runGenerateAI(keyword, model) {
   const key = getApiKey();
-  if (!key) {
+  if (!key && !isLocalProxy()) {
     apiPanel.classList.add("open");
-    showToast("timely 라우터 API 키를 먼저 저장해 주세요", );
+    showToast("timely 라우터 API 키를 먼저 저장해 주세요");
     return;
   }
   const res0 = window.DGG_ENGINE.resolve(keyword);
@@ -821,7 +827,8 @@ async function runGenerateAI(keyword, model) {
   genState = { kw: keyword, gens: [], sel: 0, matched: findMatch(keyword), motif: null, ai: model, provider: null, loading: true, body: promptBody };
   renderGen();
   try {
-    const headers = { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" };
+    const headers = { "Content-Type": "application/json" };
+    if (key) headers["Authorization"] = `Bearer ${key}`; // 없으면 로컬 실행기(timely.key)가 주입
     if (localStorage.getItem(MOCK_STORE) === "1") headers["X-Mock"] = "1";
     const resp = await fetch(`${getRouterBase()}/chat/completions`, {
       method: "POST",

@@ -24,6 +24,21 @@ PORT = 8787
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PASS_HEADERS = ("Authorization", "Content-Type", "X-Mock", "X-Mock-Tokens", "X-Mock-Delay-Ms")
 
+# API 키 자동 주입: 환경변수 TIMELY_API_KEY 또는 스크립트 옆 timely.key 파일(.gitignore 됨).
+# 키가 있으면 브라우저는 키 입력 없이 모델만 골라 쓰면 된다. 키는 로그에 남기지 않는다.
+KEY_FILE = os.path.join(ROOT, "timely.key")
+
+
+def load_local_key():
+    k = os.environ.get("TIMELY_API_KEY", "").strip()
+    if not k and os.path.isfile(KEY_FILE):
+        with open(KEY_FILE) as f:
+            k = f.read().strip()
+    return k
+
+
+LOCAL_KEY = load_local_key()
+
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def _cors(self):
@@ -71,6 +86,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             v = self.headers.get(h)
             if v:
                 req.add_header(h, v)
+        if LOCAL_KEY and not self.headers.get("Authorization"):
+            req.add_header("Authorization", f"Bearer {LOCAL_KEY}")
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
                 data = r.read()
@@ -98,5 +115,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     mimetypes.add_type("image/svg+xml", ".svg")
     print(f"Daum Graphic Generator 로컬 실행 중 (라우터 프록시 포함 → {UPSTREAM})")
+    print(f"API 키 자동 주입: {'켜짐 (timely.key)' if LOCAL_KEY else '꺼짐 — timely.key 파일을 만들면 브라우저 키 입력이 필요 없어요'}")
     print(f"브라우저에서 여세요:  http://localhost:{PORT}   (종료: Ctrl+C)")
     http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
