@@ -921,7 +921,7 @@ function renderGen() {
   const selGen = gens[sel];
   const subText = ai
     ? `AI 생성 · ${ai}${provider ? ` · via ${provider}` : ""} — 스타일 명세 준수 여부는 QA 체크리스트로 검증하세요`
-    : `${motif ? `✓ 모티프 인식됨 (${motif}) — 실제 형태로 생성` : "미등록 주제 — 무드 스케치 폴백"} · 타일 선택 시 프롬프트 갱신`;
+    : `${motif ? `✓ 모티프 인식됨 (${motif}) — 실제 형태로 생성` : "미등록 주제 — 무드 스케치 폴백 · 실제 형태가 필요하면 상단에서 AI 모델을 선택하세요"} · 타일 선택 시 프롬프트 갱신`;
   genResults.innerHTML = `
     <div class="gen-panel">
       <div class="gen-head">

@@ -305,6 +305,47 @@
         </g>`;
       },
     },
+    cat: {
+      kw: ["고양이", "cat", "냥이", "야옹", "고냥이", "키티"],
+      desc: `flat vector icon of a cat face, tan ${TAN} round head with two rounded triangular ears with red ${RED} inner ears, light gray ${GRAY} muzzle, dark gray ${DARK} round eyes and small red nose, thick light gray whisker strokes on both cheeks`,
+      draw(r) {
+        const c = pick(r, [TAN, DARK, MGRAY, ORA]);
+        const inner = c === DARK ? RED : pick(r, [RED, ORA]);
+        const eye = c === DARK ? YEL : DARK;
+        return `<g transform="rotate(${rand(r, -5, 5)} 256 256)">
+          <path d="M118 176 L96 66 L214 122 Z" fill="${c}" stroke="${c}" stroke-width="34" stroke-linejoin="round"/>
+          <path d="M394 176 L416 66 L298 122 Z" fill="${c}" stroke="${c}" stroke-width="34" stroke-linejoin="round"/>
+          <path d="M132 168 L122 100 L192 134 Z" fill="${inner}" stroke="${inner}" stroke-width="18" stroke-linejoin="round"/>
+          <path d="M380 168 L390 100 L320 134 Z" fill="${inner}" stroke="${inner}" stroke-width="18" stroke-linejoin="round"/>
+          <circle cx="256" cy="270" r="172" fill="${c}"/>
+          <ellipse cx="256" cy="330" rx="86" ry="64" fill="${GRAY}"/>
+          <circle cx="196" cy="240" r="17" fill="${eye}"/>
+          <circle cx="316" cy="240" r="17" fill="${eye}"/>
+          <path d="M256 306 l-14 -18 l28 0 Z" fill="${c === DARK ? RED : DRED}" stroke="${c === DARK ? RED : DRED}" stroke-width="8" stroke-linejoin="round"/>
+          <path d="M96 300 l64 10 M100 344 l62 -6" ${st(GRAY, 13)}/>
+          <path d="M416 300 l-64 10 M412 344 l-62 -6" ${st(GRAY, 13)}/>
+        </g>`;
+      },
+    },
+    dog: {
+      kw: ["강아지", "개", "dog", "멍멍이", "puppy", "댕댕이"],
+      desc: `flat vector icon of a dog face, tan ${TAN} round head with two brown ${BROWN} floppy drop ears hanging on the sides, light gray ${GRAY} muzzle with a dark gray ${DARK} oval nose, two dark round eyes, small red ${RED} tongue below`,
+      draw(r) {
+        const c = pick(r, [TAN, BROWN, MGRAY]);
+        const ear = c === BROWN ? DARK : BROWN;
+        return `<g transform="rotate(${rand(r, -5, 5)} 256 256)">
+          <circle cx="256" cy="256" r="168" fill="${c}"/>
+          <path d="M110 150 Q60 160 66 260 Q70 330 122 330 Q150 326 148 260 Q146 190 110 150 Z" fill="${ear}"/>
+          <path d="M402 150 Q452 160 446 260 Q442 330 390 330 Q362 326 364 260 Q366 190 402 150 Z" fill="${ear}"/>
+          <ellipse cx="256" cy="320" rx="88" ry="66" fill="${GRAY}"/>
+          <ellipse cx="256" cy="296" rx="30" ry="22" fill="${DARK}"/>
+          <circle cx="196" cy="216" r="17" fill="${DARK}"/>
+          <circle cx="316" cy="216" r="17" fill="${DARK}"/>
+          <path d="M256 318 L256 352 q0 26 26 22" ${st(DARK, 11)}/>
+          ${r() < 0.6 ? `<path d="M236 388 q20 26 40 0 l0 -14 l-40 0 Z" fill="${RED}" stroke="${RED}" stroke-width="10" stroke-linejoin="round"/>` : ""}
+        </g>`;
+      },
+    },
     gift: {
       kw: ["선물", "gift", "present", "기프트", "선물상자"],
       desc: `flat vector icon of a gift box, red ${RED} rounded box with a light gray ${GRAY} vertical ribbon and lid band, round bow with two loops on top`,
@@ -343,14 +384,12 @@
       if (i === 0) { const p = pts[0], q = pts[1]; d = `M ${(p[0] + q[0]) / 2} ${(p[1] + q[1]) / 2} `; }
       d += `Q ${nx[0]} ${nx[1]} ${mx} ${my} `;
     }
-    const hasStem = r() < 0.55;
     return {
       svg: `<path d="${d}Z" fill="${combo.main}"/>
-        ${hasStem ? `<path d="M256 122 q-6 -44 28 -60" ${st(LIME, 24)}/>` : ""}
         ${shine(190, 216)}
         <circle cx="300" cy="300" r="16" fill="${GRAY}"/>
         <circle cx="336" cy="264" r="11" fill="${combo.sub}"/>`,
-      desc: `chunky rounded blob silhouette${hasStem ? `, short curved lime green ${LIME} stem on top` : ""}, one light gray ${GRAY} curved shine mark and two small round dots`,
+      desc: `chunky rounded blob silhouette, one light gray ${GRAY} curved shine mark and two small round dots`,
     };
   }
 
