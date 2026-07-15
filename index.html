@@ -3,477 +3,491 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>아이콘 재현 프롬프트 킷 — 75종</title>
+<title>GRIDA Icons — 아이콘 재현 프롬프트 갤러리</title>
 <style>
   :root {
-    --bg: #FAFAF8;
-    --surface: #FFFFFF;
-    --ink: #26292E;
-    --ink-2: #6E747D;
-    --ink-3: #9AA0A8;
-    --line: #E7E6E2;
-    --line-2: #D8D7D2;
-    --action: #05A9E3;
-    --action-ink: #FFFFFF;
-    --code-bg: #F3F2EF;
-    --warn-bg: #FCF4E3;
-    --warn-line: #EAD9AE;
-    --warn-ink: #6B5220;
-    --ok: #42A141;
-    --fruit: #E94B35;
-    --herb: #8BC02F;
-    --food: #05A9E3;
-    --shadow: 0 1px 3px rgba(38, 41, 46, 0.07);
+    --bg: #0E0E10;
+    --panel: #17171A;
+    --panel-2: #1E1E22;
+    --line: #2A2A2E;
+    --line-2: #3A3A40;
+    --ink: #ECECEF;
+    --ink-2: #A3A3AC;
+    --ink-3: #6E6E78;
+    --action: #4C8DF5;
+    --ok: #3BA55D;
+    --warn: #E8B33E;
+    --tile: #FFFFFF;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #191A1C;
-      --surface: #212327;
-      --ink: #E8E8E6;
-      --ink-2: #A3A8AF;
-      --ink-3: #71767E;
-      --line: #33363B;
-      --line-2: #43474D;
-      --action: #2CB9EC;
-      --action-ink: #10222B;
-      --code-bg: #2A2C31;
-      --warn-bg: #322A18;
-      --warn-line: #57492A;
-      --warn-ink: #E4C983;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-    }
-  }
-  :root[data-theme="light"] {
-    --bg: #FAFAF8; --surface: #FFFFFF; --ink: #26292E; --ink-2: #6E747D; --ink-3: #9AA0A8;
-    --line: #E7E6E2; --line-2: #D8D7D2; --action: #05A9E3; --action-ink: #FFFFFF;
-    --code-bg: #F3F2EF; --warn-bg: #FCF4E3; --warn-line: #EAD9AE; --warn-ink: #6B5220;
-    --shadow: 0 1px 3px rgba(38, 41, 46, 0.07);
-  }
-  :root[data-theme="dark"] {
-    --bg: #191A1C; --surface: #212327; --ink: #E8E8E6; --ink-2: #A3A8AF; --ink-3: #71767E;
-    --line: #33363B; --line-2: #43474D; --action: #2CB9EC; --action-ink: #10222B;
-    --code-bg: #2A2C31; --warn-bg: #322A18; --warn-line: #57492A; --warn-ink: #E4C983;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  }
-
   * { box-sizing: border-box; }
+  html { scrollbar-color: var(--line-2) var(--bg); }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
+    margin: 0; background: var(--bg); color: var(--ink);
     font-family: "Apple SD Gothic Neo", Pretendard, "Noto Sans KR", system-ui, sans-serif;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
   }
-  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 96px; }
-
-  /* ── 헤더 ── */
-  header { padding: 56px 0 0; }
-  .eyebrow {
-    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-3); font-weight: 700;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  }
-  h1 { font-size: 30px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -0.02em; text-wrap: balance; }
-  .lede { color: var(--ink-2); font-size: 15px; max-width: 620px; margin: 0; }
-
-  /* ── 팔레트 스트립 ── */
-  .palette { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 0; }
-  .swatch {
-    display: flex; align-items: center; gap: 8px;
-    border: 1px solid var(--line); background: var(--surface);
-    border-radius: 999px; padding: 5px 12px 5px 6px;
-    font-size: 11.5px; cursor: pointer; color: var(--ink-2);
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    transition: border-color 120ms;
-  }
-  .swatch:hover { border-color: var(--line-2); }
-  .swatch:focus-visible, button:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
-  .swatch b { width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,0.08); }
-
-  /* ── 컨트롤 바 ── */
-  .controls {
-    position: sticky; top: 0; z-index: 10;
-    background: var(--bg);
-    padding: 16px 0 14px; margin-top: 32px;
+  .topbar {
+    position: sticky; top: 0; z-index: 30;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 20px;
+    background: rgba(14,14,16,0.86);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
-    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
   }
-  .seg { display: flex; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; }
+  .logo { display: flex; align-items: baseline; gap: 8px; flex: none; }
+  .logo b { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
+  .logo span {
+    font-size: 10px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .search {
+    flex: 1; max-width: 460px; display: flex; align-items: center; gap: 8px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 16px;
+  }
+  .search svg { flex: none; opacity: 0.5; }
+  .search input {
+    width: 100%; border: 0; background: transparent; color: var(--ink);
+    font-size: 13.5px; font-family: inherit;
+  }
+  .search input::placeholder { color: var(--ink-3); }
+  .spacer { flex: 1; }
+  .seg { display: flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; flex: none; }
   .seg button {
     border: 0; background: transparent; color: var(--ink-2);
-    padding: 8px 18px; font-size: 13.5px; font-weight: 700; cursor: pointer;
-    font-family: inherit;
+    padding: 7px 16px; font-size: 12.5px; font-weight: 700;
   }
-  .seg button.on { background: var(--action); color: var(--action-ink); }
-  .hint { font-size: 12.5px; color: var(--ink-3); }
-  .core-copy {
-    margin-left: auto;
-    border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
-    border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700;
-    cursor: pointer; font-family: inherit; box-shadow: var(--shadow);
+  .seg button.on { background: var(--ink); color: var(--bg); }
+  .guide-btn {
+    flex: none; border: 1px solid var(--line-2); background: transparent; color: var(--ink-2);
+    border-radius: 999px; padding: 7px 16px; font-size: 12.5px; font-weight: 700;
   }
-  .core-copy:hover { border-color: var(--action); }
+  .guide-btn:hover { color: var(--ink); border-color: var(--ink-3); }
 
-  /* ── 경고 콜아웃 ── */
-  .callout {
-    margin: 28px 0 0; padding: 14px 18px;
-    background: var(--warn-bg); border: 1px solid var(--warn-line);
-    border-radius: 12px; color: var(--warn-ink); font-size: 13.5px;
+  .tabs { display: flex; gap: 6px; padding: 14px 20px 4px; flex-wrap: wrap; }
+  .tab {
+    border: 1px solid transparent; background: transparent; color: var(--ink-2);
+    border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 700;
   }
-  .callout b { font-weight: 800; }
-
-  /* ── 섹션 ── */
-  section { margin-top: 44px; }
-  .sec-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
-  .sec-dot { width: 12px; height: 12px; border-radius: 4px; flex: none; align-self: center; }
-  h2 { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-  .sec-count {
-    font-size: 12px; color: var(--ink-3);
+  .tab:hover { color: var(--ink); }
+  .tab.on { background: var(--panel-2); border-color: var(--line-2); color: var(--ink); }
+  .tab .n {
+    font-size: 10.5px; color: var(--ink-3); margin-left: 5px;
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
   }
-  .sec-desc { color: var(--ink-2); font-size: 13.5px; margin: 0 0 18px; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
-
-  .card {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-    padding: 14px 16px; box-shadow: var(--shadow);
-    display: flex; flex-direction: column; gap: 8px;
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+    gap: 10px; padding: 12px 20px 80px;
   }
-  .card-top { display: flex; align-items: center; gap: 8px; }
-  .card-ko { font-size: 15px; font-weight: 800; }
-  .card-en {
-    font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase;
+  .cell {
+    position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+    background: var(--tile); border: 1px solid var(--line);
+    cursor: pointer; padding: 0; text-align: left;
+  }
+  .cell img {
+    position: absolute; inset: 12%; width: 76%; height: 76%;
+    object-fit: contain; display: block;
+  }
+  .cell .veil {
+    position: absolute; inset: 0; opacity: 0;
+    background: linear-gradient(to top, rgba(10,10,12,0.82) 0%, rgba(10,10,12,0.25) 45%, transparent 70%);
+    transition: opacity 140ms ease;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 10px 12px;
+  }
+  .cell:hover .veil, .cell:focus-visible .veil { opacity: 1; }
+  .veil .row { display: flex; align-items: flex-end; gap: 8px; }
+  .veil .ko { font-size: 13.5px; font-weight: 800; color: #fff; }
+  .veil .en {
+    font-size: 9.5px; color: rgba(255,255,255,0.65); letter-spacing: 0.08em; text-transform: uppercase;
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
   }
-  .card-body {
-    font-size: 11.5px; color: var(--ink-2); line-height: 1.6;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    background: var(--code-bg); border-radius: 8px; padding: 8px 10px;
-    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .copy {
+  .veil .cp {
     margin-left: auto; flex: none;
-    border: 1px solid var(--line-2); background: transparent; color: var(--ink-2);
-    border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700;
-    cursor: pointer; font-family: inherit; transition: all 120ms;
+    border: 1px solid rgba(255,255,255,0.35); background: rgba(20,20,24,0.55); color: #fff;
+    border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+    backdrop-filter: blur(4px);
   }
-  .copy:hover { border-color: var(--action); color: var(--action); }
-  .copy.done { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .veil .cp:hover { background: rgba(255,255,255,0.92); color: #111; }
+  .empty { grid-column: 1 / -1; text-align: center; color: var(--ink-3); padding: 80px 0; font-size: 14px; }
 
-  /* ── 코어/체크리스트 ── */
-  .core-block {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-    padding: 16px 18px; box-shadow: var(--shadow); margin-top: 12px;
+  .overlay {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    background: rgba(8,8,10,0.78); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 24px;
   }
-  .core-block h3 { margin: 0 0 8px; font-size: 14px; font-weight: 800; }
-  .core-text {
-    font-size: 12px; line-height: 1.7; color: var(--ink-2);
+  .overlay.open { display: flex; }
+  .sheet {
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 18px;
+    max-width: 940px; width: 100%; max-height: 90vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .sheet-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; border-bottom: 1px solid var(--line);
+  }
+  .sheet-head h2 { margin: 0; font-size: 15px; font-weight: 800; }
+  .x {
+    margin-left: auto; border: 0; background: var(--panel-2); color: var(--ink-2);
+    width: 30px; height: 30px; border-radius: 8px; font-size: 14px; font-weight: 700;
+  }
+  .x:hover { color: var(--ink); }
+
+  .detail-body { display: flex; min-height: 0; }
+  .detail-img {
+    flex: 1.1; background: var(--tile); display: flex; align-items: center; justify-content: center;
+    min-width: 0; position: relative;
+  }
+  .detail-img img { width: 74%; height: 74%; object-fit: contain; }
+  .navbtn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    border: 0; background: rgba(14,14,16,0.55); color: #fff;
+    width: 34px; height: 34px; border-radius: 50%; font-size: 15px; font-weight: 700;
+    backdrop-filter: blur(4px);
+  }
+  .navbtn:hover { background: rgba(14,14,16,0.85); }
+  .navbtn.prev { left: 10px; }
+  .navbtn.next { right: 10px; }
+  .detail-info {
+    flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px;
+    overflow-y: auto; min-width: 320px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line-2); border-radius: 999px;
+    padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--ink-2);
+  }
+  .badge i { width: 8px; height: 8px; border-radius: 3px; display: inline-block; }
+  .detail-info h3 { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.01em; }
+  .detail-info .en-sub {
+    font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase;
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    background: var(--code-bg); border-radius: 8px; padding: 10px 12px;
-    overflow-x: auto; white-space: pre-wrap; word-break: break-word;
   }
-  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
-  ul.check { margin: 8px 0 0; padding: 0 0 0 2px; list-style: none; }
-  ul.check li { padding: 5px 0 5px 26px; position: relative; font-size: 13.5px; color: var(--ink-2); }
-  ul.check li::before {
-    content: "✓"; position: absolute; left: 0; top: 5px;
-    width: 18px; height: 18px; border-radius: 5px; background: var(--ok); color: #fff;
-    font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  .prompt-box {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; font-size: 12px; line-height: 1.7; color: var(--ink-2);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    max-height: 220px; overflow-y: auto; word-break: break-word;
   }
-  ol.tips { margin: 8px 0 0; padding-left: 20px; }
-  ol.tips li { font-size: 13.5px; color: var(--ink-2); margin: 6px 0; }
-  code.k {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px;
-    background: var(--code-bg); border-radius: 5px; padding: 1px 6px; color: var(--ink);
+  .prompt-box b { color: var(--ink); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line); background: var(--panel-2); color: var(--ink-2);
+    border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 10.5px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
   }
-  footer { margin-top: 56px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 16px; }
+  .chip b { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); }
+  .actions { display: flex; gap: 8px; margin-top: auto; }
+  .btn {
+    border: 0; border-radius: 10px; padding: 11px 16px; font-size: 13px; font-weight: 800;
+    flex: 1;
+  }
+  .btn.primary { background: var(--ink); color: var(--bg); }
+  .btn.primary:hover { background: #fff; }
+  .btn.ghost { background: var(--panel-2); color: var(--ink-2); border: 1px solid var(--line-2); }
+  .btn.ghost:hover { color: var(--ink); }
+  .modehint { font-size: 11px; color: var(--ink-3); }
 
+  .guide-body { padding: 18px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .guide-body h4 { margin: 0 0 8px; font-size: 13px; font-weight: 800; color: var(--ink); }
+  .g-block { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .g-block ol, .g-block ul { margin: 0; padding-left: 18px; }
+  .g-block li { font-size: 12.5px; color: var(--ink-2); margin: 5px 0; }
+  .g-note { border-left: 3px solid var(--warn); padding: 10px 14px; background: var(--panel-2); border-radius: 0 10px 10px 0; font-size: 12.5px; color: var(--ink-2); }
+  code.k {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px;
+    background: var(--bg); border-radius: 5px; padding: 1px 6px; color: var(--ink);
+  }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+    background: var(--ink); color: var(--bg); border-radius: 999px;
+    padding: 9px 20px; font-size: 13px; font-weight: 700;
+    opacity: 0; pointer-events: none; transition: all 180ms ease; z-index: 90;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 720px) {
+    .detail-body { flex-direction: column; }
+    .detail-img { aspect-ratio: 1; flex: none; }
+    .search { max-width: none; }
+  }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <div class="eyebrow">GRIDA · Icon Reproduction Prompt Kit v1</div>
-    <h1>아이콘 재현 프롬프트 킷 — 75종</h1>
-    <p class="lede">
-      디자인팀 레퍼런스(Fruit·Herb·Food 각 25종)를 미드저니·힉스필드에서 동일한 디자인으로
-      재현하기 위한 복사용 프롬프트 세트. SVG 원본에서 추출한 공식 팔레트 기준.
-    </p>
-    <div class="palette" id="palette" aria-label="공식 팔레트 (클릭 시 HEX 복사)"></div>
-  </header>
-
-  <div class="controls">
-    <div class="seg" role="group" aria-label="출력 대상 선택">
-      <button id="mode-mj" class="on">미드저니</button>
-      <button id="mode-hf">힉스필드</button>
-    </div>
-    <span class="hint" id="mode-hint">복사 버튼이 미드저니 완성형(파라미터 포함)을 복사합니다</span>
-    <button class="core-copy" id="core-copy">공통 스타일 코어만 복사</button>
+<div class="topbar">
+  <div class="logo"><b>GRIDA Icons</b><span>Prompt Gallery · 75</span></div>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="아이콘·프롬프트 검색 (예: 수박, chili, cyan)" aria-label="검색">
   </div>
-
-  <div class="callout">
-    <b>파일 정리 필요</b> — Food 세트(일부 Herb 포함)의 PNG 파일명과 실제 이미지가 섞여 있습니다.
-    예: table.png=주먹밥, spoon and fork.png=테이크아웃 봉투, pudding.png=피자커터.
-    파일명 기준 1:1 비교 QA 시 오판 위험이 있어, 본 킷은 <b>정식 주제명 기준</b>으로 작성했습니다.
+  <div class="spacer"></div>
+  <div class="seg" role="group" aria-label="출력 대상">
+    <button id="mode-mj" class="on">미드저니</button>
+    <button id="mode-hf">힉스필드</button>
   </div>
+  <button class="guide-btn" id="open-guide">가이드</button>
+</div>
 
-  <div id="sections"></div>
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="grid"></div>
 
-  <section>
-    <div class="sec-head"><h2>공통 스타일 코어</h2></div>
-    <p class="sec-desc">모든 프롬프트 뒤에 붙는 공통 문장 — 위 복사 버튼에 이미 포함되어 있습니다.</p>
-    <div class="two-col">
-      <div class="core-block">
-        <h3>미드저니 (v6/v7)</h3>
-        <div class="core-text" id="core-mj-text"></div>
+<div class="overlay" id="detail-ov" role="dialog" aria-modal="true">
+  <div class="sheet" style="max-width:880px">
+    <div class="sheet-head">
+      <h2>아이콘 상세</h2>
+      <button class="x" id="d-close" aria-label="닫기">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-img">
+        <img id="d-img" alt="">
+        <button class="navbtn prev" id="d-prev" aria-label="이전">‹</button>
+        <button class="navbtn next" id="d-next" aria-label="다음">›</button>
       </div>
-      <div class="core-block">
-        <h3>힉스필드</h3>
-        <div class="core-text" id="core-hf-text"></div>
+      <div class="detail-info">
+        <div><span class="badge" id="d-set"></span></div>
+        <div>
+          <h3 id="d-ko"></h3>
+          <div class="en-sub" id="d-en"></div>
+        </div>
+        <div class="prompt-box" id="d-prompt"></div>
+        <div class="chips" id="d-chips"></div>
+        <div class="modehint" id="d-hint"></div>
+        <div class="actions">
+          <button class="btn primary" id="d-copy">프롬프트 복사</button>
+          <button class="btn ghost" id="d-copy-core">코어만 복사</button>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</div>
 
-  <section>
-    <div class="sec-head"><h2>재현율을 끌어올리는 팁</h2></div>
-    <div class="two-col">
-      <div class="core-block">
-        <h3>미드저니</h3>
-        <ol class="tips">
-          <li>프롬프트만으로 부족하면 레퍼런스 PNG 3~4장으로 <code class="k">--sref URL --sw 300~600</code> 스타일 앵커를 추가</li>
-          <li><code class="k">--style raw</code> 필수, <code class="k">--s</code>는 50 이하 유지 (기본 미화 보정이 스타일을 오염)</li>
-          <li>시리즈 일관성이 필요하면 첫 성공 컷의 <code class="k">--seed</code>를 고정</li>
+<div class="overlay" id="guide-ov" role="dialog" aria-modal="true">
+  <div class="sheet" style="max-width:720px">
+    <div class="sheet-head">
+      <h2>사용 가이드 · 공통 스타일 코어</h2>
+      <button class="x" id="g-close" aria-label="닫기">✕</button>
+    </div>
+    <div class="guide-body">
+      <div class="g-note">
+        원본 레퍼런스의 <b>파일명↔이미지 셔플 문제</b>는 75개 이미지를 전수 식별해
+        <b>실제 이미지 기준으로 프롬프트를 매핑·재작성</b>했습니다. 갤러리의 이미지-프롬프트 쌍이 정답 기준입니다.
+      </div>
+      <div class="g-block">
+        <h4>미드저니 코어 (v6/v7) — 프롬프트 복사에 자동 포함</h4>
+        <div class="prompt-box" id="g-core-mj" style="max-height:none"></div>
+      </div>
+      <div class="g-block">
+        <h4>힉스필드 코어 — 힉스필드 모드에서 자동 포함</h4>
+        <div class="prompt-box" id="g-core-hf" style="max-height:none"></div>
+      </div>
+      <div class="g-block">
+        <h4>재현율 팁</h4>
+        <ol>
+          <li>미드저니: 부족하면 레퍼런스 PNG 3~4장으로 <code class="k">--sref URL --sw 300~600</code> 스타일 앵커 추가</li>
+          <li>미드저니: <code class="k">--style raw</code> 필수, <code class="k">--s</code> 50 이하 · 시리즈는 <code class="k">--seed</code> 고정</li>
+          <li>힉스필드: 이미지 레퍼런스 1장 첨부, 네거티브 필드에 <code class="k">outline, stroke, gradient, shadow, 3d, texture, text</code></li>
           <li>hex는 방향 지시 — 최종 납품은 벡터 리드로우(트레이싱) 전제</li>
         </ol>
       </div>
-      <div class="core-block">
-        <h3>힉스필드</h3>
-        <ol class="tips">
-          <li>이미지 레퍼런스 첨부 기능이 있으면 레퍼런스 PNG 1장을 함께 첨부</li>
-          <li>네거티브 필드가 따로 있으면: <code class="k">outline, stroke, gradient, shadow, 3d render, texture, background objects, text, watermark</code></li>
-        </ol>
+      <div class="g-block">
+        <h4>완성도 검증 체크리스트 (QA 6항목)</h4>
+        <ul>
+          <li>외곽선 없음 — 실루엣이 솔리드 필로만 구성</li>
+          <li>그라디언트 · 그림자 · 질감 없음</li>
+          <li>색상 2~3개 + 하이라이트 그레이(#EBEBEB), 공식 팔레트 근접</li>
+          <li>디테일은 굵은 라운드 스트로크 2~3개 이하</li>
+          <li>모든 모서리 · 선 끝 라운드 처리</li>
+          <li>순백 배경, 오브젝트 프레임 85% 이상 점유</li>
+        </ul>
       </div>
     </div>
-  </section>
-
-  <section>
-    <div class="sec-head"><h2>완성도 검증 체크리스트</h2><span class="sec-count">QA 6항목</span></div>
-    <div class="core-block">
-      <ul class="check">
-        <li>외곽선(스트로크 보더) 없음 — 실루엣이 솔리드 필로만 구성</li>
-        <li>그라디언트 · 그림자 · 질감 없음</li>
-        <li>색상 수 2~3개 + 하이라이트 그레이(#EBEBEB), 공식 팔레트 근접</li>
-        <li>디테일이 굵은 라운드 스트로크 형태 2~3개 이하</li>
-        <li>모든 모서리 · 선 끝이 라운드 처리</li>
-        <li>순백 배경, 오브젝트가 프레임의 85% 이상 점유</li>
-      </ul>
-    </div>
-  </section>
-
-  <footer>
-    원본: ~/Downloads/Icon_Ref (SVG 32×32 viewBox, Illustrator flat export) · 팔레트는 전체 SVG fill 빈도 분석으로 추출 ·
-    외부 상용 아이콘 팩 기반일 경우 재현물 배포 전 라이선스 확인 필요
-  </footer>
+  </div>
 </div>
 
+<div id="toast" role="status"></div>
+
+<script src="data.js"></script>
 <script>
-const PALETTE = [
-  ["#EBEBEB", "하이라이트"], ["#8BC02F", "라임"], ["#F2C500", "옐로"], ["#F59D00", "오렌지"],
-  ["#05A9E3", "시안"], ["#E94B35", "레드"], ["#C23824", "레드 음영"], ["#42A141", "딥그린"],
-  ["#8D5836", "브라운"], ["#BF9760", "탄"], ["#BEBEBE", "미드그레이"], ["#323232", "다크"],
-  ["#9C56B8", "퍼플"], ["#6D2AB0", "딥퍼플"]
-];
+const { SETS, CORE_MJ, CORE_HF } = window.GRIDA_DATA;
 
-const CORE_MJ = ", solid flat fills, two-tone color blocking, chunky rounded blob shapes, fully rounded line caps, small details cut out as thick light-gray #EBEBEB rounded strokes, minimal flat icon set style, isolated on pure white background, centered, fills the frame --ar 1:1 --style raw --s 50 --no outline, gradient, shadow, 3d, texture, text, watermark";
-const CORE_HF = ", drawn as a simple flat vector icon: solid flat fills only, two or three colors, chunky rounded blob shapes with fully rounded line caps, small details cut out as thick light-gray rounded strokes, absolutely no outlines, no gradients, no shadows, no 3D, pure white empty background, subject centered and filling the frame";
-
-const SETS = [
-  {
-    name: "Fruit Icon Set", color: "var(--fruit)",
-    desc: "과일 25종 — 광택 마크와 씨앗 디테일, 잎/꼭지는 라임 그린이 기본.",
-    items: [
-      ["사과", "apple", "flat vector icon of a vermilion red #E94B35 apple with soft double-lobed bottom, short lime green #8BC02F stem, two light-gray #EBEBEB curved shine marks in the center"],
-      ["바나나", "banana", "flat vector icon of a golden yellow #F2C500 banana, single curved crescent shape with rounded tips, one thin light-gray #EBEBEB ridge line"],
-      ["블루베리", "blueberry", "flat vector icon of a cluster of three cyan-navy blueberries as overlapping circles, one circle in light gray #EBEBEB as highlight ball, small dark star-shaped calyx dots, lime green #8BC02F leaf"],
-      ["체리", "cherry", "flat vector icon of two vermilion red #E94B35 cherries hanging from one lime green #8BC02F forked stem with a leaf, one light-gray #EBEBEB shine dot on each cherry"],
-      ["초콜릿", "chocolate", "flat vector icon of a chocolate bar in warm brown #8D5836 with tan #BF9760 broken corner squares, rounded square segments in a grid"],
-      ["시트러스", "citrus", "flat vector icon of a citrus half in orange #F59D00 with golden yellow #F2C500 inner circle divided into rounded wedge segments by light-gray #EBEBEB gaps"],
-      ["코코넛", "coconut", "flat vector icon of a brown #8D5836 coconut half with light-gray #EBEBEB thick inner ring of flesh and tan #BF9760 shell rim, three small dark dots on top"],
-      ["두리안", "durian", "flat vector icon of a golden yellow #F2C500 durian, oval body covered with short rounded triangular spikes, lime green #8BC02F stem"],
-      ["포도", "grape", "flat vector icon of a bunch of grapes made of six overlapping circles in two purples #9C56B8 and #6D2AB0, one circle in light gray #EBEBEB as highlight, curved lime green #8BC02F stem"],
-      ["키위", "kiwi", "flat vector icon of a kiwi half, deep green #42A141 rim with lime green #8BC02F flesh, light-gray #EBEBEB rounded center, ring of small dark #323232 seed dots"],
-      ["레몬", "lemon", "flat vector icon of a golden yellow #F2C500 lemon with pointed rounded ends, small lime green #8BC02F leaf, one light-gray #EBEBEB curved shine mark"],
-      ["리치", "lychee", "flat vector icon of a lychee, vermilion red #E94B35 bumpy round shell with small rounded dot bumps, light-gray #EBEBEB peeled white flesh showing, lime green #8BC02F stem"],
-      ["망고", "mango", "flat vector icon of an orange #F59D00 mango, plump teardrop shape tilted diagonally, golden yellow #F2C500 lower half, lime green #8BC02F leaf on top, one light-gray #EBEBEB shine mark"],
-      ["망고스틴", "mangosteen", "flat vector icon of a mangosteen, deep purple #6D2AB0 round fruit with thick lime green #8BC02F four-leaf calyx cap on top, one light-gray #EBEBEB shine dot"],
-      ["멜론", "melon", "flat vector icon of a melon, lime green #8BC02F round body with light-gray #EBEBEB curved net lines, short tan #BF9760 T-shaped stem"],
-      ["오렌지", "orange", "flat vector icon of an orange #F59D00 round orange fruit with two lime green #8BC02F leaves on top, one light-gray #EBEBEB curved shine mark"],
-      ["파파야", "papaya", "flat vector icon of a papaya half, orange #F59D00 flesh with golden yellow #F2C500 outer rim, oval cavity filled with small dark #323232 round seeds"],
-      ["복숭아", "peach", "flat vector icon of a peach, orange #F59D00 round fruit with soft cleft and golden yellow #F2C500 blush side, lime green #8BC02F leaf, one light-gray #EBEBEB shine mark"],
-      ["배", "pear", "flat vector icon of a pear, lime green #8BC02F bulbous bottom-heavy silhouette, short brown #8D5836 stem, one light-gray #EBEBEB curved shine mark"],
-      ["파인애플", "pineapple", "flat vector icon of a pineapple tilted diagonally, golden yellow #F2C500 oval body with seven small light-gray #EBEBEB rounded dashes in a diamond pattern, spiky lime green #8BC02F crown of three leaves"],
-      ["석류", "pomegranate", "flat vector icon of a pomegranate, vermilion red #E94B35 round fruit with small crown-shaped calyx on top, darker red #C23824 cut window showing light-gray #EBEBEB seeds cluster"],
-      ["스타프루트", "starfruit", "flat vector icon of a starfruit slice, golden yellow #F2C500 five-pointed star shape with rounded tips, light-gray #EBEBEB small center dots"],
-      ["딸기", "strawberry", "flat vector icon of a strawberry, vermilion red #E94B35 rounded heart-shaped berry with lime green #8BC02F leafy cap, scattered small light-gray #EBEBEB seed dashes"],
-      ["수박 조각", "watermelon slice", "flat vector icon of a watermelon slice tilted 45 degrees, vermilion red #E94B35 flesh wedge inside thick lime green #8BC02F rind crescent, three small dark #323232 rounded seed dashes"],
-      ["수박", "watermelon", "flat vector icon of a whole watermelon, lime green #8BC02F round body with deep green #42A141 wavy stripes, short curly stem, one light-gray #EBEBEB shine mark"]
-    ]
-  },
-  {
-    name: "Herb Icon Set", color: "var(--herb)",
-    desc: "허브·향신료 25종 — 브라운/탄 계열과 그린 계열이 중심.",
-    items: [
-      ["팔각", "star anise", "flat vector icon of a star anise, brown #8D5836 eight-pointed star pod with rounded arms, tan #BF9760 small round seeds in each arm"],
-      ["바질", "basil", "flat vector icon of a basil sprig, three lime green #8BC02F rounded teardrop leaves on a deep green #42A141 stem, one light-gray #EBEBEB vein line on the biggest leaf"],
-      ["후추 그라인더", "black pepper", "flat vector icon of a black pepper mill, mid-gray #BEBEBE rounded grinder body with dark gray #323232 cap, three dark #323232 peppercorn dots beside it"],
-      ["고추", "chili", "flat vector icon of a chili pepper curving diagonally, vermilion red #E94B35 tapered body with pointed tip, chunky lime green #8BC02F wavy cap and curved stem covering the top"],
-      ["시나몬", "cinnamon", "flat vector icon of a cinnamon stick tilted 45 degrees, tan #BF9760 rolled log with light-gray #EBEBEB spiral swirl at the end, two brown #8D5836 short diagonal line details"],
-      ["정향", "clove", "flat vector icon of two clove buds, brown #8D5836 nail-shaped stems with tan #BF9760 round bud tops, crossed diagonally"],
-      ["냄비(허브)", "cooking pot", "flat vector icon of a cooking pot, cyan blue #05A9E3 rounded pot body with light-gray #EBEBEB lid and two side handles, three light-gray steam curls above"],
-      ["고수", "coriander", "flat vector icon of a coriander bunch, three lime green #8BC02F flat parsley-like rounded leaf clusters on thin deep green #42A141 stems"],
-      ["새싹 채소", "cress", "flat vector icon of a cress sprout, two lime green #8BC02F rounded cotyledon leaves on a thin light-gray #EBEBEB stem with small roots"],
-      ["딜", "dill", "flat vector icon of a dill sprig, deep green #42A141 central stem with feathery lime green #8BC02F thin rounded needle clusters"],
-      ["마늘", "garlic", "flat vector icon of a garlic bulb, light-gray #EBEBEB plump bulb with soft pointed top, mid-gray #BEBEBE clove dividing curves, small roots at the bottom"],
-      ["생강", "ginger", "flat vector icon of a ginger root, tan #BF9760 knobby branching root with rounded lobes, one lime green #8BC02F small sprout on top"],
-      ["대파", "green onion", "flat vector icon of green onions, three lime green #8BC02F long tapered stalks with light-gray #EBEBEB white bulb ends, tips bent slightly"],
-      ["화분 허브", "herb", "flat vector icon of a potted herb, lime green #8BC02F rounded leaf cluster in a vermilion red #E94B35 flower pot with light-gray #EBEBEB rim"],
-      ["민트", "mint", "flat vector icon of a mint sprig, two pairs of lime green #8BC02F rounded serrated leaves on a deep green #42A141 stem, light-gray #EBEBEB center vein marks"],
-      ["맵기 금지", "no chili", "flat vector icon of a no-spicy sign, vermilion red #E94B35 chili pepper with lime green #8BC02F stem crossed out by a bold red #C23824 diagonal prohibition slash inside a red ring"],
-      ["양파 슬라이스", "onion slice", "flat vector icon of an onion slice, golden yellow #F2C500 half-ring cross-section with light-gray #EBEBEB concentric ring gaps"],
-      ["양파", "onion", "flat vector icon of an onion bulb, golden yellow #F2C500 plump bulb with narrow pointed top, light-gray #EBEBEB curved root whiskers crossing at the bottom"],
-      ["피망", "pepper", "flat vector icon of a bell pepper, vermilion red #E94B35 plump three-lobed body, lime green #8BC02F short stem, one light-gray #EBEBEB curved shine mark"],
-      ["향신료 가루", "powder", "flat vector icon of a spice powder bowl, cyan blue #05A9E3 rounded bowl filled with orange #F59D00 powder mound, small powder puff dots above"],
-      ["호박", "pumpkin", "flat vector icon of a pumpkin, orange #F59D00 ribbed round body with darker orange #F2C500 side lobes, short lime green #8BC02F curled stem"],
-      ["소금", "salt", "flat vector icon of a salt shaker, light-gray #EBEBEB rounded bottle with mid-gray #BEBEBE cap and three holes, tilted with small white grain dots falling"],
-      ["소스", "sauce", "flat vector icon of a sauce bottle, vermilion red #E94B35 squeeze bottle with tapered nozzle and light-gray #EBEBEB cap band, one shine mark"],
-      ["설탕", "sugar", "flat vector icon of a sugar sack, light-gray #EBEBEB rounded pouch with folded top, cyan blue #05A9E3 label band, small white cube beside it"],
-      ["타마린드", "tamarind", "flat vector icon of a tamarind pod, brown #8D5836 curved lumpy bean pod, tan #BF9760 broken segment showing, small deep green #42A141 stem"]
-    ]
-  },
-  {
-    name: "Food Icon Set", color: "var(--food)",
-    desc: "음식·주방 25종 — 도구·집기류는 시안 블루가 시그니처.",
-    items: [
-      ["앞치마", "apron", "flat vector icon of a kitchen apron, cyan blue #05A9E3 apron with rounded bib, light-gray #EBEBEB neck strap and waist ties, one front pocket"],
-      ["버거", "burger", "flat vector icon of a burger, tan #BF9760 rounded bun halves, vermilion red #E94B35 tomato layer, lime green #8BC02F wavy lettuce, brown #8D5836 patty, three light-gray #EBEBEB sesame dots"],
-      ["샴페인", "champagne", "flat vector icon of a champagne bottle, deep green #42A141 bottle with golden yellow #F2C500 foil top, light-gray #EBEBEB label, tilted with two celebration spark dots"],
-      ["셰프 모자", "chef hat", "flat vector icon of a chef hat, cyan blue #05A9E3 puffy three-lobed toque with light-gray #EBEBEB bottom band, three small light-gray crease marks"],
-      ["클로슈 접시", "dish", "flat vector icon of a covered dish, cyan blue #05A9E3 rounded cloche dome with light-gray #EBEBEB knob and plate underneath"],
-      ["도넛", "donuts", "flat vector icon of a donut, tan #BF9760 ring with vermilion red #E94B35 icing drip on top, small light-gray #EBEBEB and golden yellow sprinkle dashes"],
-      ["배달 스쿠터", "food delivery", "flat vector icon of a food delivery scooter, vermilion red #E94B35 scooter with light-gray #EBEBEB delivery box on the back, mid-gray #BEBEBE wheels"],
-      ["음식 주문", "food order", "flat vector icon of a food order smartphone, cyan blue #05A9E3 phone with light-gray #EBEBEB screen showing a vermilion red #E94B35 burger symbol and one order button bar"],
-      ["메뉴북", "menu book", "flat vector icon of an open menu book, vermilion red #E94B35 cover with light-gray #EBEBEB open pages showing rounded text line bars and a small dish symbol"],
-      ["메뉴 리스트", "menu list", "flat vector icon of a menu list clipboard, cyan blue #05A9E3 board with light-gray #EBEBEB paper, rounded line bars and small vermilion red #E94B35 check dots"],
-      ["주먹밥", "onigiri", "flat vector icon of an onigiri rice ball, light-gray #EBEBEB rounded triangle rice body with dark #323232 nori seaweed band at the bottom"],
-      ["팬케이크", "pancake", "flat vector icon of a pancake stack, three tan #BF9760 rounded pancake layers with golden yellow #F2C500 butter square and brown #8D5836 syrup drip"],
-      ["피자 커터", "pizza cutter", "flat vector icon of a pizza cutter tilted 45 degrees, lime green #8BC02F rounded handle, light-gray #EBEBEB circular blade with mid-gray #BEBEBE center hub dot"],
-      ["피자 박스", "pizza delivery", "flat vector icon of a pizza delivery box, vermilion red #E94B35 flat box with light-gray #EBEBEB lid opening showing a golden yellow #F2C500 pizza circle with pepperoni dots"],
-      ["냄비", "pot", "flat vector icon of a cooking pot, cyan blue #05A9E3 deep pot with light-gray #EBEBEB lid knob and two rounded side handles"],
-      ["푸딩", "pudding", "flat vector icon of a caramel pudding, golden yellow #F2C500 wobbly rounded flan with brown #8D5836 caramel top drip, on a light-gray #EBEBEB plate, one vermilion red #E94B35 cherry on top"],
-      ["냉장고", "refrigerator", "flat vector icon of a refrigerator, cyan blue #05A9E3 rounded two-door fridge with light-gray #EBEBEB handles and freezer divider line"],
-      ["밥그릇", "rice bowl", "flat vector icon of a rice bowl, vermilion red #E94B35 rounded bowl with light-gray #EBEBEB mounded rice on top and two brown #8D5836 chopsticks resting diagonally"],
-      ["밀대", "rolling pin", "flat vector icon of a rolling pin tilted 45 degrees, tan #BF9760 cylinder body with brown #8D5836 rounded handles on both ends"],
-      ["간판", "sign", "flat vector icon of a restaurant sign board, cyan blue #05A9E3 hanging signboard with light-gray #EBEBEB post and a golden yellow #F2C500 fork-and-spoon emblem"],
-      ["소다", "soda", "flat vector icon of a soda cup, vermilion red #E94B35 takeaway cup with light-gray #EBEBEB lid and cyan blue #05A9E3 bent straw, one bubble dot"],
-      ["뒤집개", "spatula", "flat vector icon of a spatula tilted 45 degrees, cyan blue #05A9E3 rounded handle with light-gray #EBEBEB wide flipper head with three slot dashes"],
-      ["수저 세트", "spoon and fork", "flat vector icon of a spoon and fork side by side, light-gray #EBEBEB fork tines and spoon head with cyan blue #05A9E3 rounded thick handles"],
-      ["식탁", "table", "flat vector icon of a dining table, cyan blue #05A9E3 rounded tablecloth draping over with wavy bottom edge, light-gray #EBEBEB table legs peeking below"],
-      ["테이크아웃", "take away", "flat vector icon of a takeaway paper bag, tan #BF9760 bag with folded top and light-gray #EBEBEB handle cutout, small vermilion red #E94B35 heart mark on the front"]
-    ]
-  }
-];
+const ITEMS = [];
+SETS.forEach((set) => {
+  set.items.forEach((it) => {
+    ITEMS.push({ set: set.id, setName: set.name, color: set.color, ko: it.ko, en: it.en, body: it.body, img: `img/${set.id}/${it.file}` });
+  });
+});
 
 let mode = "mj";
+let tab = "all";
+let query = "";
+let currentList = [];
+let currentIdx = -1;
 
-function fullPrompt(body) {
-  return body + (mode === "mj" ? CORE_MJ : CORE_HF);
+const fullPrompt = (body) => body + (mode === "mj" ? CORE_MJ : CORE_HF);
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(() => t.classList.remove("show"), 1500);
 }
 
-async function copyText(text, btn, doneLabel) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
+async function copyText(text, msg) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
     const ta = document.createElement("textarea");
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand("copy"); ta.remove();
   }
-  if (btn) {
-    const prev = btn.textContent;
-    btn.textContent = doneLabel || "복사됨 ✓";
-    btn.classList.add("done");
-    setTimeout(() => { btn.textContent = prev; btn.classList.remove("done"); }, 1400);
-  }
+  showToast(msg || (mode === "mj" ? "미드저니 프롬프트를 복사했어요" : "힉스필드 프롬프트를 복사했어요"));
 }
 
-/* 팔레트 */
-const pal = document.getElementById("palette");
-PALETTE.forEach(([hex, name]) => {
-  const b = document.createElement("button");
-  b.className = "swatch";
-  b.innerHTML = `<b style="background:${hex}"></b>${hex}<span style="color:var(--ink-3)">${name}</span>`;
-  b.addEventListener("click", () => copyText(hex, b, "✓"));
-  pal.appendChild(b);
-});
-
-/* 섹션 렌더 */
-const root = document.getElementById("sections");
-SETS.forEach((set) => {
-  const sec = document.createElement("section");
-  sec.innerHTML = `
-    <div class="sec-head">
-      <span class="sec-dot" style="background:${set.color}"></span>
-      <h2>${set.name}</h2>
-      <span class="sec-count">${set.items.length} prompts</span>
-    </div>
-    <p class="sec-desc">${set.desc}</p>`;
-  const grid = document.createElement("div");
-  grid.className = "grid";
-  set.items.forEach(([ko, en, body]) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-top">
-        <span class="card-ko">${ko}</span>
-        <span class="card-en">${en}</span>
-        <button class="copy">복사</button>
-      </div>
-      <div class="card-body">${body}</div>`;
-    card.querySelector(".copy").addEventListener("click", (e) => {
-      copyText(fullPrompt(body), e.currentTarget);
-    });
-    grid.appendChild(card);
+/* 탭 */
+const tabsEl = document.getElementById("tabs");
+function renderTabs() {
+  const defs = [{ id: "all", name: "전체", n: ITEMS.length }].concat(
+    SETS.map((s) => ({ id: s.id, name: s.name, n: s.items.length }))
+  );
+  tabsEl.innerHTML = "";
+  defs.forEach((d) => {
+    const b = document.createElement("button");
+    b.className = "tab" + (tab === d.id ? " on" : "");
+    b.innerHTML = `${d.name}<span class="n">${d.n}</span>`;
+    b.addEventListener("click", () => { tab = d.id; renderTabs(); renderGrid(); });
+    tabsEl.appendChild(b);
   });
-  sec.appendChild(grid);
-  root.appendChild(sec);
+}
+
+/* 그리드 */
+const gridEl = document.getElementById("grid");
+function filtered() {
+  const q = query.trim().toLowerCase();
+  return ITEMS.filter((it) =>
+    (tab === "all" || it.set === tab) &&
+    (!q || it.ko.toLowerCase().includes(q) || it.en.toLowerCase().includes(q) || it.body.toLowerCase().includes(q))
+  );
+}
+function renderGrid() {
+  const list = filtered();
+  currentList = list;
+  gridEl.innerHTML = "";
+  if (list.length === 0) {
+    gridEl.innerHTML = `<div class="empty">검색 결과가 없어요 — 다른 키워드로 찾아보세요</div>`;
+    return;
+  }
+  list.forEach((it, i) => {
+    const cell = document.createElement("button");
+    cell.className = "cell";
+    cell.setAttribute("aria-label", `${it.ko} 상세 보기`);
+    cell.innerHTML = `
+      <img src="${it.img}" alt="${it.ko} 레퍼런스 아이콘" loading="lazy">
+      <span class="veil">
+        <span class="row">
+          <span>
+            <span class="ko">${it.ko}</span><br>
+            <span class="en">${it.en}</span>
+          </span>
+          <span class="cp" role="button" tabindex="-1">복사</span>
+        </span>
+      </span>`;
+    cell.querySelector(".cp").addEventListener("click", (e) => {
+      e.stopPropagation();
+      copyText(fullPrompt(it.body));
+    });
+    cell.addEventListener("click", () => openDetail(i));
+    gridEl.appendChild(cell);
+  });
+}
+
+/* 상세 모달 */
+const dOv = document.getElementById("detail-ov");
+function escapeHtml(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+function openDetail(idx) {
+  currentIdx = idx;
+  const it = currentList[idx];
+  if (!it) return;
+  document.getElementById("d-img").src = it.img;
+  document.getElementById("d-img").alt = `${it.ko} 레퍼런스 아이콘`;
+  document.getElementById("d-ko").textContent = it.ko;
+  document.getElementById("d-en").textContent = it.en;
+  document.getElementById("d-set").innerHTML = `<i style="background:${it.color}"></i>${it.setName} Icon Set`;
+  document.getElementById("d-prompt").innerHTML =
+    `<b>${escapeHtml(it.body)}</b><br><span style="opacity:0.55">${escapeHtml((mode === "mj" ? CORE_MJ : CORE_HF).slice(2))}</span>`;
+  const chips = document.getElementById("d-chips");
+  chips.innerHTML = "";
+  (it.body.match(/#[0-9A-Fa-f]{6}/g) || []).forEach((hex) => {
+    const c = document.createElement("button");
+    c.className = "chip";
+    c.innerHTML = `<b style="background:${hex}"></b>${hex.toUpperCase()}`;
+    c.addEventListener("click", () => copyText(hex.toUpperCase(), `${hex.toUpperCase()} 복사했어요`));
+    chips.appendChild(c);
+  });
+  document.getElementById("d-hint").textContent =
+    mode === "mj" ? "복사 시 미드저니 완성형(파라미터 포함)으로 복사됩니다" : "복사 시 힉스필드용 서술형(파라미터 없음)으로 복사됩니다";
+  dOv.classList.add("open");
+}
+function step(d) {
+  if (currentIdx < 0 || currentList.length === 0) return;
+  openDetail((currentIdx + d + currentList.length) % currentList.length);
+}
+document.getElementById("d-close").addEventListener("click", () => dOv.classList.remove("open"));
+document.getElementById("d-prev").addEventListener("click", () => step(-1));
+document.getElementById("d-next").addEventListener("click", () => step(1));
+document.getElementById("d-copy").addEventListener("click", () => {
+  const it = currentList[currentIdx];
+  if (it) copyText(fullPrompt(it.body));
+});
+document.getElementById("d-copy-core").addEventListener("click", () => {
+  copyText((mode === "mj" ? CORE_MJ : CORE_HF).slice(2), "공통 코어를 복사했어요");
+});
+dOv.addEventListener("click", (e) => { if (e.target === dOv) dOv.classList.remove("open"); });
+
+/* 가이드 모달 */
+const gOv = document.getElementById("guide-ov");
+document.getElementById("open-guide").addEventListener("click", () => gOv.classList.add("open"));
+document.getElementById("g-close").addEventListener("click", () => gOv.classList.remove("open"));
+gOv.addEventListener("click", (e) => { if (e.target === gOv) gOv.classList.remove("open"); });
+document.getElementById("g-core-mj").textContent = CORE_MJ.slice(2);
+document.getElementById("g-core-hf").textContent = CORE_HF.slice(2);
+
+/* 키보드 */
+document.addEventListener("keydown", (e) => {
+  if (dOv.classList.contains("open")) {
+    if (e.key === "Escape") dOv.classList.remove("open");
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  } else if (gOv.classList.contains("open") && e.key === "Escape") {
+    gOv.classList.remove("open");
+  }
 });
 
-/* 코어 표시 + 복사 */
-document.getElementById("core-mj-text").textContent = CORE_MJ.slice(2);
-document.getElementById("core-hf-text").textContent = CORE_HF.slice(2);
-document.getElementById("core-copy").addEventListener("click", (e) => {
-  copyText(mode === "mj" ? CORE_MJ.slice(2) : CORE_HF.slice(2), e.currentTarget);
-});
-
-/* 모드 전환 */
+/* 모드 · 검색 */
 const mjBtn = document.getElementById("mode-mj");
 const hfBtn = document.getElementById("mode-hf");
-const hint = document.getElementById("mode-hint");
 function setMode(m) {
   mode = m;
   mjBtn.classList.toggle("on", m === "mj");
   hfBtn.classList.toggle("on", m === "hf");
-  hint.textContent = m === "mj"
-    ? "복사 버튼이 미드저니 완성형(파라미터 포함)을 복사합니다"
-    : "복사 버튼이 힉스필드용 서술형(파라미터 없음)을 복사합니다";
+  if (dOv.classList.contains("open") && currentIdx >= 0) openDetail(currentIdx);
 }
 mjBtn.addEventListener("click", () => setMode("mj"));
 hfBtn.addEventListener("click", () => setMode("hf"));
+document.getElementById("q").addEventListener("input", (e) => {
+  query = e.target.value;
+  renderGrid();
+});
+
+renderTabs();
+renderGrid();
 </script>
 </body>
 </html>
