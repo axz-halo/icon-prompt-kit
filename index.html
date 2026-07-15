@@ -752,6 +752,19 @@ document.getElementById("api-clear").addEventListener("click", () => {
 });
 updateKeyBadge();
 
+/* 키 자동 주입 링크: 주소 뒤에 #k=<API키> 를 붙여 공유하면
+   한 번 열었을 때 키가 이 브라우저에 저장되고 주소에서 즉시 제거된다.
+   (키는 저장소/서버에 남지 않음 — 프래그먼트는 서버로 전송되지 않는다) */
+(function () {
+  const m = location.hash.match(/[#&]k=([^&]+)/);
+  if (!m) return;
+  localStorage.setItem(KEY_STORE, decodeURIComponent(m[1]).trim());
+  keyInput.value = getApiKey();
+  history.replaceState(null, "", location.pathname + location.search);
+  updateKeyBadge();
+  showToast("API 키가 자동 설정됐어요 — 이제 모델만 선택해서 생성하세요");
+})();
+
 const AI_SYSTEM = `You are an icon generator for a strict flat design system. Output EXACTLY 4 <svg> elements and nothing else — no markdown, no explanations.
 Rules for every SVG:
 - <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">, transparent background (no background rect)
