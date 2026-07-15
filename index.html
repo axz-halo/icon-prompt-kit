@@ -352,10 +352,14 @@
       <input id="api-key-input" type="password" placeholder="stg.timelyai.io 콘솔에서 발급 (Bearer 키)" autocomplete="off">
     </div>
     <div class="api-row">
+      <label for="api-base-input">라우터 주소</label>
+      <input id="api-base-input" type="text" placeholder="https://router.stg.timelyai.io/v1 (프록시: http://localhost:8787/v1)" autocomplete="off" style="flex:1;min-width:220px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:12.5px;font-family:ui-monospace,'SF Mono',Menlo,monospace">
+    </div>
+    <div class="api-row">
       <label class="chk"><input type="checkbox" id="api-mock"> 테스트 모드 (X-Mock: 1) — 실제 LLM 호출 없이 연동 검증</label>
     </div>
     <div class="api-row api-actions">
-      <span class="api-note">키는 이 브라우저(localStorage)에만 저장돼요 · 엔드포인트: router.stg.timelyai.io/v1 · 현재 크레딧 차감 없음(추후 적용 예정)</span>
+      <span class="api-note">키는 이 브라우저(localStorage)에만 저장돼요 · stg 라우터는 브라우저 직접 호출(CORS)을 아직 허용하지 않아요 — 저장소의 <b>proxy.py</b>를 실행하고 라우터 주소를 <b>http://localhost:8787/v1</b>로 바꾸면 동작해요 · 현재 크레딧 차감 없음</span>
       <button class="re" id="api-save">저장</button>
       <button class="re" id="api-clear">키 삭제</button>
     </div>
@@ -704,7 +708,9 @@ const genResults = document.getElementById("gen-results");
 let genState = null; // {kw, gens[], sel, matched, motif, ai, provider, loading}
 
 /* ── AI API (timely-router) ── */
-const ROUTER_BASE = "https://router.stg.timelyai.io/v1";
+const DEFAULT_ROUTER_BASE = "https://router.stg.timelyai.io/v1";
+const BASE_STORE = "dgg-timely-base";
+const getRouterBase = () => (localStorage.getItem(BASE_STORE) || DEFAULT_ROUTER_BASE).replace(/\/+$/, "");
 const AI_MODELS = [
   "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5",
   "gemini-3.5-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite",
@@ -734,15 +740,20 @@ const getApiKey = () => localStorage.getItem(KEY_STORE) || "";
 function updateKeyBadge() {
   cogBtn.classList.toggle("warn", modelSel.value !== "local" && !getApiKey());
 }
+const baseInput = document.getElementById("api-base-input");
 keyInput.value = getApiKey();
+baseInput.value = localStorage.getItem(BASE_STORE) || "";
 mockChk.checked = localStorage.getItem(MOCK_STORE) === "1";
 cogBtn.addEventListener("click", () => apiPanel.classList.toggle("open"));
 document.getElementById("api-save").addEventListener("click", () => {
   localStorage.setItem(KEY_STORE, keyInput.value.trim());
+  const base = baseInput.value.trim();
+  if (base) localStorage.setItem(BASE_STORE, base);
+  else localStorage.removeItem(BASE_STORE);
   localStorage.setItem(MOCK_STORE, mockChk.checked ? "1" : "0");
   apiPanel.classList.remove("open");
   updateKeyBadge();
-  showToast(keyInput.value.trim() ? "API 키를 저장했어요 (이 브라우저에만 보관)" : "키가 비어 있어요");
+  showToast(keyInput.value.trim() ? "설정을 저장했어요 (이 브라우저에만 보관)" : "키가 비어 있어요");
 });
 document.getElementById("api-clear").addEventListener("click", () => {
   localStorage.removeItem(KEY_STORE);
@@ -773,6 +784,7 @@ Rules for every SVG:
 - Chunky rounded blob shapes; every stroke uses stroke-linecap="round"; 2-3 colors per icon
 - Small details drawn as thick light-gray #EBEBEB rounded strokes or dots (2-3 details max)
 - Subject centered, filling about 80% of the frame; keep under 20 elements per SVG
+- NO background: never draw a rect/shape covering the whole canvas — the canvas stays transparent
 Make the 4 variants clearly distinct (composition/tilt/accent) but the same subject and identical style.`;
 
 function sanitizeSvg(s) {
@@ -782,7 +794,9 @@ function sanitizeSvg(s) {
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, "")
     .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
-    .replace(/\s(?:xlink:)?href\s*=\s*"(?!#)[^"]*"/gi, "");
+    .replace(/\s(?:xlink:)?href\s*=\s*"(?!#)[^"]*"/gi, "")
+    // 캔버스 전체를 덮는 배경 rect 제거 (흰 타일 위 회색판 방지)
+    .replace(/<rect[^>]*width="51[02]"[^>]*height="51[02]"[^>]*\/?>(?:<\/rect>)?/gi, "");
   if (!/xmlns=/.test(t)) t = t.replace(/<svg/i, '<svg xmlns="http://www.w3.org/2000/svg"');
   return t;
 }
@@ -803,7 +817,7 @@ async function runGenerateAI(keyword, model) {
   try {
     const headers = { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" };
     if (localStorage.getItem(MOCK_STORE) === "1") headers["X-Mock"] = "1";
-    const resp = await fetch(`${ROUTER_BASE}/chat/completions`, {
+    const resp = await fetch(`${getRouterBase()}/chat/completions`, {
       method: "POST",
       headers,
       body: JSON.stringify({
