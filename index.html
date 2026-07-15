@@ -223,6 +223,45 @@
     border-radius: 11px; padding: 10px 22px; font-size: 13.5px; font-weight: 800;
   }
   .imagine-bar .gen:hover { background: #fff; }
+  .imagine-bar select {
+    flex: none; max-width: 190px;
+    background: var(--panel); color: var(--ink-2);
+    border: 1px solid var(--line-2); border-radius: 10px;
+    padding: 9px 10px; font-size: 12px; font-weight: 700; font-family: inherit;
+  }
+  .imagine-bar .cog {
+    flex: none; border: 1px solid var(--line-2); background: transparent; color: var(--ink-2);
+    border-radius: 10px; width: 38px; height: 38px; font-size: 15px;
+  }
+  .imagine-bar .cog:hover, .imagine-bar .cog.warn { color: var(--warn); border-color: var(--warn); }
+  .api-panel {
+    display: none; max-width: 760px; margin: 10px auto 0;
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .api-panel.open { display: block; }
+  .api-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .api-row:last-child { margin-bottom: 0; }
+  .api-row label { font-size: 12px; font-weight: 700; color: var(--ink-2); flex: none; }
+  .api-row input[type="password"] {
+    flex: 1; min-width: 220px; background: var(--panel-2); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px;
+    font-size: 12.5px; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .api-row .chk { display: flex; align-items: center; gap: 7px; font-weight: 400; }
+  .api-actions .api-note { font-size: 11px; color: var(--ink-3); flex: 1; min-width: 200px; }
+  .api-panel .re {
+    border: 1px solid var(--line-2); background: transparent; color: var(--ink-2);
+    border-radius: 9px; padding: 7px 16px; font-size: 12px; font-weight: 700;
+  }
+  .api-panel .re:hover { color: var(--ink); }
+  .gtile.loading { display: flex; align-items: center; justify-content: center; }
+  .gtile.loading::after {
+    content: ""; width: 30px; height: 30px; border-radius: 50%;
+    border: 4px solid #E0E0E0; border-top-color: var(--action);
+    animation: dggspin 0.9s linear infinite;
+  }
+  @keyframes dggspin { to { transform: rotate(360deg); } }
   .gen-panel {
     max-width: 1080px; margin: 18px auto 6px; padding: 18px;
     background: var(--panel); border: 1px solid var(--line-2); border-radius: 18px;
@@ -303,7 +342,23 @@
   <div class="imagine-bar">
     <span class="plus">✦</span>
     <input id="gen-q" type="text" maxlength="60" placeholder="만들고 싶은 아이콘을 입력하고 생성하세요 — 예: 김밥, 자전거, coffee" aria-label="생성 키워드">
+    <select id="gen-model" aria-label="AI API 선택" title="생성에 사용할 엔진/AI 모델"></select>
+    <button class="cog" id="gen-key" title="timely 라우터 API 키 설정">⚙</button>
     <button class="gen" id="gen-btn">생성</button>
+  </div>
+  <div class="api-panel" id="api-panel">
+    <div class="api-row">
+      <label for="api-key-input">timely 라우터 API 키</label>
+      <input id="api-key-input" type="password" placeholder="stg.timelyai.io 콘솔에서 발급 (Bearer 키)" autocomplete="off">
+    </div>
+    <div class="api-row">
+      <label class="chk"><input type="checkbox" id="api-mock"> 테스트 모드 (X-Mock: 1) — 실제 LLM 호출 없이 연동 검증</label>
+    </div>
+    <div class="api-row api-actions">
+      <span class="api-note">키는 이 브라우저(localStorage)에만 저장돼요 · 엔드포인트: router.stg.timelyai.io/v1 · 현재 크레딧 차감 없음(추후 적용 예정)</span>
+      <button class="re" id="api-save">저장</button>
+      <button class="re" id="api-clear">키 삭제</button>
+    </div>
   </div>
 </div>
 <div id="gen-results"></div>
@@ -646,7 +701,131 @@ document.getElementById("q").addEventListener("input", (e) => {
 /* ── 생성 섹션 ── */
 const genInput = document.getElementById("gen-q");
 const genResults = document.getElementById("gen-results");
-let genState = null; // {kw, gens[], sel, matched, motif}
+let genState = null; // {kw, gens[], sel, matched, motif, ai, provider, loading}
+
+/* ── AI API (timely-router) ── */
+const ROUTER_BASE = "https://router.stg.timelyai.io/v1";
+const AI_MODELS = [
+  "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5",
+  "gemini-3.5-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite",
+  "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano",
+  "deepseek-v4-pro", "deepseek-chat",
+];
+const KEY_STORE = "dgg-timely-key";
+const MOCK_STORE = "dgg-timely-mock";
+const MODEL_STORE = "dgg-timely-model";
+
+const modelSel = document.getElementById("gen-model");
+modelSel.innerHTML =
+  `<option value="local">로컬 엔진 (기본)</option>` +
+  AI_MODELS.map((m) => `<option value="${m}">AI · ${m}</option>`).join("");
+modelSel.value = localStorage.getItem(MODEL_STORE) || "local";
+modelSel.addEventListener("change", () => {
+  localStorage.setItem(MODEL_STORE, modelSel.value);
+  updateKeyBadge();
+  if (modelSel.value !== "local" && !getApiKey()) apiPanel.classList.add("open");
+});
+
+const apiPanel = document.getElementById("api-panel");
+const keyInput = document.getElementById("api-key-input");
+const mockChk = document.getElementById("api-mock");
+const cogBtn = document.getElementById("gen-key");
+const getApiKey = () => localStorage.getItem(KEY_STORE) || "";
+function updateKeyBadge() {
+  cogBtn.classList.toggle("warn", modelSel.value !== "local" && !getApiKey());
+}
+keyInput.value = getApiKey();
+mockChk.checked = localStorage.getItem(MOCK_STORE) === "1";
+cogBtn.addEventListener("click", () => apiPanel.classList.toggle("open"));
+document.getElementById("api-save").addEventListener("click", () => {
+  localStorage.setItem(KEY_STORE, keyInput.value.trim());
+  localStorage.setItem(MOCK_STORE, mockChk.checked ? "1" : "0");
+  apiPanel.classList.remove("open");
+  updateKeyBadge();
+  showToast(keyInput.value.trim() ? "API 키를 저장했어요 (이 브라우저에만 보관)" : "키가 비어 있어요");
+});
+document.getElementById("api-clear").addEventListener("click", () => {
+  localStorage.removeItem(KEY_STORE);
+  keyInput.value = "";
+  updateKeyBadge();
+  showToast("API 키를 삭제했어요");
+});
+updateKeyBadge();
+
+const AI_SYSTEM = `You are an icon generator for a strict flat design system. Output EXACTLY 4 <svg> elements and nothing else — no markdown, no explanations.
+Rules for every SVG:
+- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">, transparent background (no background rect)
+- Flat vector only: solid fills, NO gradients, NO shadows, NO outlines/borders, NO text
+- Palette ONLY these hexes: #E94B35 #C23824 #F2C500 #F59D00 #8BC02F #42A141 #EBEBEB #BEBEBE #323232 #8D5836 #BF9760 #9C56B8 #6D2AB0 #05A9E3
+- Chunky rounded blob shapes; every stroke uses stroke-linecap="round"; 2-3 colors per icon
+- Small details drawn as thick light-gray #EBEBEB rounded strokes or dots (2-3 details max)
+- Subject centered, filling about 80% of the frame; keep under 20 elements per SVG
+Make the 4 variants clearly distinct (composition/tilt/accent) but the same subject and identical style.`;
+
+function sanitizeSvg(s) {
+  let t = s.trim();
+  if (!/^<svg[\s>]/i.test(t)) return null;
+  t = t
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, "")
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
+    .replace(/\s(?:xlink:)?href\s*=\s*"(?!#)[^"]*"/gi, "");
+  if (!/xmlns=/.test(t)) t = t.replace(/<svg/i, '<svg xmlns="http://www.w3.org/2000/svg"');
+  return t;
+}
+
+async function runGenerateAI(keyword, model) {
+  const key = getApiKey();
+  if (!key) {
+    apiPanel.classList.add("open");
+    showToast("timely 라우터 API 키를 먼저 저장해 주세요", );
+    return;
+  }
+  const res0 = window.DGG_ENGINE.resolve(keyword);
+  const promptBody = res0.type === "motif"
+    ? window.DGG_ENGINE.generate(keyword, 1).body
+    : `flat vector icon of ${keyword}`;
+  genState = { kw: keyword, gens: [], sel: 0, matched: findMatch(keyword), motif: null, ai: model, provider: null, loading: true, body: promptBody };
+  renderGen();
+  try {
+    const headers = { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" };
+    if (localStorage.getItem(MOCK_STORE) === "1") headers["X-Mock"] = "1";
+    const resp = await fetch(`${ROUTER_BASE}/chat/completions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: AI_SYSTEM },
+          { role: "user", content: `Subject: "${keyword}". Style hint from our reference set: ${promptBody}. Return 4 distinct variant SVGs.` },
+        ],
+        max_completion_tokens: 6000,
+      }),
+    });
+    if (!genState || genState.kw !== keyword || genState.ai !== model) return; // 사용자가 다른 생성 시작
+    if (resp.status === 401) throw new Error("401 — API 키가 유효하지 않아요. ⚙에서 키를 확인하세요.");
+    if (!resp.ok) throw new Error(`라우터 오류 HTTP ${resp.status}`);
+    const provider = resp.headers.get("X-Provider");
+    const data = await resp.json();
+    const content = data?.choices?.[0]?.message?.content || "";
+    const svgs = (content.match(/<svg[\s\S]*?<\/svg>/gi) || []).map(sanitizeSvg).filter(Boolean);
+    if (svgs.length === 0) {
+      throw new Error(localStorage.getItem(MOCK_STORE) === "1"
+        ? "테스트 모드(X-Mock)는 합성 텍스트를 반환해요 — 연동 확인 성공, SVG는 실제 모델에서 생성하세요."
+        : "응답에서 SVG를 찾지 못했어요 — 다시 생성해 보세요.");
+    }
+    genState.gens = svgs.slice(0, 4).map((svg, i) => ({ svg, body: promptBody, seed: (window.DGG_ENGINE.hash(keyword) + i) >>> 0, motif: null }));
+    genState.provider = provider;
+    genState.loading = false;
+    renderGen();
+  } catch (e) {
+    genState = null;
+    renderGen();
+    showToast(e?.message?.includes("Failed to fetch")
+      ? "라우터에 연결하지 못했어요 — 네트워크/CORS 정책을 확인하세요 (사내망 필요할 수 있음)"
+      : (e?.message || "생성 실패"));
+  }
+}
 
 function findMatch(kw) {
   const k = kw.toLowerCase();
@@ -670,6 +849,11 @@ function archiveAdd(g, kw) {
 function runGenerate(kw, reseed) {
   const keyword = kw.trim();
   if (!keyword) { genInput.focus(); return; }
+  if (modelSel.value !== "local") {
+    runGenerateAI(keyword, modelSel.value);
+    genResults.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    return;
+  }
   const baseSeed = reseed ? Math.floor(Math.random() * 2 ** 31) : window.DGG_ENGINE.hash(keyword) ^ 0x9e3779b9;
   const gens = [0, 1, 2, 3].map((i) => window.DGG_ENGINE.generate(keyword, baseSeed + i * 7919));
   const res = window.DGG_ENGINE.resolve(keyword);
@@ -677,6 +861,7 @@ function runGenerate(kw, reseed) {
     kw: keyword, gens, sel: 0,
     matched: findMatch(keyword),
     motif: res.type === "motif" ? res.id : null,
+    ai: null, provider: null, loading: false,
   };
   renderGen();
   genResults.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -684,13 +869,31 @@ function runGenerate(kw, reseed) {
 
 function renderGen() {
   if (!genState) { genResults.innerHTML = ""; return; }
-  const { kw, gens, sel, matched, motif } = genState;
+  const { kw, gens, sel, matched, motif, ai, provider, loading } = genState;
+  if (loading) {
+    genResults.innerHTML = `
+      <div class="gen-panel">
+        <div class="gen-head">
+          <h3>“${kw}” 생성 중…</h3>
+          <span class="sub">AI 생성 · ${ai} — 라우터 응답을 기다리는 중 (수십 초 걸릴 수 있어요)</span>
+          <button class="re" id="gen-close">취소</button>
+        </div>
+        <div class="gen-tiles">
+          ${[0, 1, 2, 3].map(() => `<div class="gtile loading"></div>`).join("")}
+        </div>
+      </div>`;
+    document.getElementById("gen-close").addEventListener("click", () => { genState = null; renderGen(); });
+    return;
+  }
   const selGen = gens[sel];
+  const subText = ai
+    ? `AI 생성 · ${ai}${provider ? ` · via ${provider}` : ""} — 스타일 명세 준수 여부는 QA 체크리스트로 검증하세요`
+    : `${motif ? `✓ 모티프 인식됨 (${motif}) — 실제 형태로 생성` : "미등록 주제 — 무드 스케치 폴백"} · 타일 선택 시 프롬프트 갱신`;
   genResults.innerHTML = `
     <div class="gen-panel">
       <div class="gen-head">
         <h3>“${kw}” 생성 결과</h3>
-        <span class="sub">${motif ? `✓ 모티프 인식됨 (${motif}) — 실제 형태로 생성` : "미등록 주제 — 무드 스케치 폴백"} · 타일 선택 시 프롬프트 갱신</span>
+        <span class="sub">${subText}</span>
         <button class="re" id="gen-re">↻ 다시 생성</button>
         <button class="re" id="gen-close">닫기</button>
       </div>
@@ -719,7 +922,10 @@ function renderGen() {
       <div class="gen-note">마음에 드는 변형은 [보관]으로 Archive 탭에 축적하세요 — 갤러리·검색·다운로드에 함께 잡히고, [보관함 내보내기]로 정식 세트 편입을 요청할 수 있어요. 고품질 결과물은 프롬프트를 미드저니/힉스필드에 붙여넣어 생성하세요.</div>
     </div>`;
 
-  document.getElementById("gen-re").addEventListener("click", () => runGenerate(kw, true));
+  document.getElementById("gen-re").addEventListener("click", () => {
+    if (genState?.ai) runGenerateAI(kw, genState.ai);
+    else runGenerate(kw, true);
+  });
   document.getElementById("gen-close").addEventListener("click", () => { genState = null; renderGen(); });
   document.getElementById("gen-copy").addEventListener("click", () => copyText(selGen.body + (mode === "mj" ? CORE_MJ : CORE_HF)));
   genResults.querySelectorAll(".gtile .keep").forEach((b) => {
