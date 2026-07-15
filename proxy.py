@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
-"""Daum Graphic Generator — timely-router 로컬 CORS 프록시
+"""Daum Graphic Generator — 로컬 실행기 (사이트 서빙 + timely-router CORS 프록시)
 
-라우터(stg)가 브라우저 CORS를 아직 허용하지 않아, 사이트에서 AI 생성을 쓰려면
-이 프록시를 로컬에서 실행하고 사이트 ⚙ 패널의 '라우터 주소'를 바꿔주면 된다.
+라우터(stg)가 브라우저 CORS를 아직 허용하지 않아, 이 스크립트가
+① 갤러리 사이트를 http://localhost:8787 에서 서빙하고
+② /v1/* 요청을 라우터로 그대로 전달(CORS 문제 자체가 사라짐)한다.
 
 사용법:
-  python3 proxy.py                      # http://localhost:8787 에서 실행
-  사이트 ⚙ → 라우터 주소: http://localhost:8787/v1 → 저장
+  python3 proxy.py        # 실행 후 브라우저에서 http://localhost:8787 열기
+  (같은 출처라 라우터 주소 설정 불필요 — 키만 ⚙ 또는 #k= 링크로 넣으면 끝)
 
 API 키는 브라우저가 Authorization 헤더로 보내는 것을 그대로 전달만 하며,
 이 프록시는 키를 저장하거나 기록하지 않는다.
 """
 import http.server
 import json
+import mimetypes
+import os
 import urllib.error
 import urllib.request
 
 UPSTREAM = "https://router.stg.timelyai.io"
 PORT = 8787
+ROOT = os.path.dirname(os.path.abspath(__file__))
 PASS_HEADERS = ("Authorization", "Content-Type", "X-Mock", "X-Mock-Tokens", "X-Mock-Delay-Ms")
 
 
@@ -34,10 +38,28 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        self._proxy("GET")
+        if self.path.startswith("/v1/") or self.path == "/health":
+            self._proxy("GET")
+        else:
+            self._static()
 
     def do_POST(self):
         self._proxy("POST")
+
+    def _static(self):
+        # 사이트 정적 파일 서빙 (쿼리/프래그먼트 제거, 디렉터리 탈출 방지)
+        path = self.path.split("?")[0].split("#")[0]
+        if path in ("", "/"):
+            path = "/index.html"
+        full = os.path.normpath(os.path.join(ROOT, path.lstrip("/")))
+        if not full.startswith(ROOT) or not os.path.isfile(full):
+            self._respond(404, b"not found", "text/plain", None)
+            return
+        ctype = mimetypes.guess_type(full)[0] or "application/octet-stream"
+        if ctype.startswith("text/") or ctype in ("application/javascript", "image/svg+xml"):
+            ctype += "; charset=utf-8"
+        with open(full, "rb") as f:
+            self._respond(200, f.read(), ctype, None)
 
     def _proxy(self, method):
         body = None
@@ -74,6 +96,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"DGG 프록시 실행 중 → {UPSTREAM}")
-    print(f"사이트 ⚙ 라우터 주소에 입력:  http://localhost:{PORT}/v1   (종료: Ctrl+C)")
+    mimetypes.add_type("image/svg+xml", ".svg")
+    print(f"Daum Graphic Generator 로컬 실행 중 (라우터 프록시 포함 → {UPSTREAM})")
+    print(f"브라우저에서 여세요:  http://localhost:{PORT}   (종료: Ctrl+C)")
     http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

@@ -710,7 +710,13 @@ let genState = null; // {kw, gens[], sel, matched, motif, ai, provider, loading}
 /* ── AI API (timely-router) ── */
 const DEFAULT_ROUTER_BASE = "https://router.stg.timelyai.io/v1";
 const BASE_STORE = "dgg-timely-base";
-const getRouterBase = () => (localStorage.getItem(BASE_STORE) || DEFAULT_ROUTER_BASE).replace(/\/+$/, "");
+const getRouterBase = () => {
+  const saved = localStorage.getItem(BASE_STORE);
+  if (saved) return saved.replace(/\/+$/, "");
+  // proxy.py(localhost:8787)로 서빙 중이면 같은 출처의 /v1 사용 — CORS 불필요
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return `${location.origin}/v1`;
+  return DEFAULT_ROUTER_BASE;
+};
 const AI_MODELS = [
   "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5",
   "gemini-3.5-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite",
