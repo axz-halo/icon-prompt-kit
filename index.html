@@ -531,13 +531,20 @@ Single object centered on a plain white background, square, ~10% margin.</div>
           <input type="file" id="mood-files" multiple accept=".svg,image/png,image/jpeg" style="flex:1;min-width:200px;color:var(--ink-2);font-size:12px">
           <button class="re" id="mood-run">분석 & 제안받기</button>
         </div>
-        <div class="api-note" id="mood-status">디자인팀 아이콘(SVG 권장 · PNG는 팔레트만 분석)을 올리면 AI가 무드를 분석해 아래 팔레트·마스터 프롬프트 초안을 채워줘요. 검토·수정 후 [저장]하면 적용됩니다. 피그마에서는 Export → SVG로 내보내 업로드하세요.</div>
+        <div class="api-row">
+          <label class="chk"><input type="checkbox" id="mood-merge" checked> 기존 스펙에 병합 (권장) — 끄면 업로드 자산만으로 새로 정의</label>
+        </div>
+        <div class="api-note" id="mood-status">디자인팀 아이콘(SVG 권장 · PNG는 팔레트만 분석)을 올리면 AI가 무드를 분석해 아래 팔레트·마스터 프롬프트 초안을 채워줘요. 소수 샘플이 기존 스펙을 물타기하지 않도록 병합 모드가 기본입니다. 피그마에서는 Export → SVG로 내보내 업로드하세요. (AI 분석은 로컬 실행기 필요)</div>
       </div>
       <div class="g-block"><h4>팔레트</h4><div class="chips" id="t-palette"></div></div>
       <div class="g-block"><h4>미드저니 마스터 프롬프트 (편집 가능)</h4><textarea id="t-mj" class="t-area" spellcheck="false"></textarea></div>
       <div class="g-block"><h4>힉스필드 마스터 프롬프트 (편집 가능)</h4><textarea id="t-hf" class="t-area" spellcheck="false"></textarea></div>
       <div class="api-row api-actions">
-        <span class="api-note">편집 내용은 이 브라우저에만 저장돼요 · AI 생성 규칙과 프롬프트 복사가 이 마스터 프롬프트를 따라가요 · 새 테마가 필요하면 원본 그래픽 자산을 확보해 정밀 추출 후 themes.js에 추가하세요</span>
+        <span class="api-note">편집 내용은 이 브라우저에만 저장돼요 — 확정된 무드는 [무드 내보내기]로 파일을 만들어 팀에 공유하거나 themes.js 정식 편입을 요청하세요</span>
+        <input type="file" id="mood-import-file" accept=".json" style="display:none">
+        <button class="re" id="mood-export">무드 내보내기</button>
+        <button class="re" id="mood-import">무드 가져오기</button>
+        <button class="re" id="t-rollback">이전 저장본 복원</button>
         <button class="re" id="t-reset">기본값 복원</button>
         <button class="re" id="t-save">저장</button>
       </div>
@@ -862,8 +869,10 @@ const BASE_STORE = "dgg-timely-base";
 const getRouterBase = () => {
   const saved = localStorage.getItem(BASE_STORE);
   if (saved) return saved.replace(/\/+$/, "");
-  // proxy.py(localhost:8787)로 서빙 중이면 같은 출처의 /v1 사용 — CORS 불필요
-  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return `${location.origin}/v1`;
+  // 로컬 실행기(localhost) 또는 Vercel 배포(서버리스 프록시)면 같은 출처 /v1 사용 — CORS 불필요
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname.endsWith(".vercel.app")) {
+    return `${location.origin}/v1`;
+  }
   return DEFAULT_ROUTER_BASE;
 };
 // AI 역할 = 무드 학습된 '단일 프롬프트 가이드' 생성 (SVG 직생성 아님)
@@ -895,7 +904,8 @@ const keyInput = document.getElementById("api-key-input");
 const mockChk = document.getElementById("api-mock");
 const cogBtn = document.getElementById("gen-key");
 const getApiKey = () => localStorage.getItem(KEY_STORE) || "";
-const isLocalProxy = () => /^https?:\/\/(localhost|127\.0\.0\.1)/.test(getRouterBase());
+// 같은 출처 프록시(로컬 실행기 또는 Vercel 함수) 사용 중이면 키가 서버에서 주입되므로 브라우저 키 불필요
+const isLocalProxy = () => getRouterBase().startsWith(location.origin);
 function updateKeyBadge() {
   cogBtn.classList.toggle("warn", modelSel.value !== "local" && !getApiKey() && !isLocalProxy());
 }
@@ -1252,6 +1262,10 @@ tSel.addEventListener("change", () => {
   showToast(`${getTheme().name} 적용됨`);
 });
 document.getElementById("t-save").addEventListener("click", () => {
+  // 롤백용으로 직전 저장본 보관
+  const prevKey = themeOvrKey(getThemeId()) + "-prev";
+  const cur = localStorage.getItem(themeOvrKey(getThemeId()));
+  if (cur) localStorage.setItem(prevKey, cur);
   const ovr = { coreMJ: tMj.value, coreHF: tHf.value };
   if (moodProposal) {
     if (Array.isArray(moodProposal.palette) && moodProposal.palette.length) ovr.palette = moodProposal.palette;
@@ -1267,6 +1281,66 @@ document.getElementById("t-reset").addEventListener("click", () => {
   moodProposal = null;
   refreshThemeUI();
   showToast("기본값으로 복원했어요");
+});
+document.getElementById("t-rollback").addEventListener("click", () => {
+  const prevKey = themeOvrKey(getThemeId()) + "-prev";
+  const prev = localStorage.getItem(prevKey);
+  if (!prev) { showToast("이전 저장본이 없어요"); return; }
+  const cur = localStorage.getItem(themeOvrKey(getThemeId()));
+  localStorage.setItem(themeOvrKey(getThemeId()), prev);
+  if (cur) localStorage.setItem(prevKey, cur); // 맞바꿔서 다시 되돌리기 가능
+  moodProposal = null;
+  refreshThemeUI();
+  showToast("이전 저장본으로 복원했어요 (한 번 더 누르면 되돌아가요)");
+});
+
+/* 무드 내보내기/가져오기 — 팀 공유·정식 편입 경로 */
+document.getElementById("mood-export").addEventListener("click", () => {
+  const t = getTheme();
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    name: t.name,
+    palette: t.palette,
+    aiRules: t.aiRules,
+    coreMJ: t.coreMJ,
+    coreHF: t.coreHF,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `dgg-mood-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast("무드 파일을 내려받았어요 — 팀 공유 또는 themes.js 편입 요청에 사용하세요");
+});
+document.getElementById("mood-import").addEventListener("click", () => document.getElementById("mood-import-file").click());
+document.getElementById("mood-import-file").addEventListener("change", async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    if (!j.coreMJ || !j.coreHF) throw new Error("무드 파일 형식이 아니에요 (coreMJ/coreHF 필요)");
+    moodProposal = { palette: j.palette || [], styleRules: j.aiRules || [], coreMJ: j.coreMJ, coreHF: j.coreHF };
+    tMj.value = j.coreMJ;
+    tHf.value = j.coreHF;
+    if (Array.isArray(j.palette) && j.palette.length) {
+      const pal = document.getElementById("t-palette");
+      pal.innerHTML = "";
+      j.palette.forEach((hex) => {
+        const c = document.createElement("button");
+        c.className = "chip";
+        c.innerHTML = `<b style="background:${hex}"></b>${hex}`;
+        c.addEventListener("click", () => copyText(hex, `${hex} 복사했어요`));
+        pal.appendChild(c);
+      });
+    }
+    document.getElementById("mood-status").innerHTML =
+      `💡 무드 파일을 불러왔어요 (${j.name || "이름 없음"}${j.exportedAt ? " · " + j.exportedAt.slice(0, 10) : ""}) — 검토 후 <b>[저장]</b>하면 적용돼요.`;
+  } catch (err) {
+    showToast(err?.message || "무드 파일을 읽지 못했어요");
+  }
+  e.target.value = "";
 });
 
 /* ── 무드 삽입: 업로드 자산 분석 → LLM이 마스터 프롬프트 제안 ── */
@@ -1317,10 +1391,14 @@ function svgMoodStats(svgTexts) {
   };
 }
 
-async function analyzeMood(svgTexts, pngPalettes, model) {
+async function analyzeMood(svgTexts, pngPalettes, model, merge) {
   const stats = svgMoodStats(svgTexts);
   const samples = svgTexts.slice(0, 6).map((s, i) => `--- sample ${i + 1} ---\n${s.slice(0, 1400)}`).join("\n");
-  const sysMsg = `You are a design-system analyst. From the uploaded icon assets, extract the visual mood and produce an updated master prompt set for image generation.
+  const t = getTheme();
+  const mergeBlock = merge
+    ? `\nMERGE MODE: update the EXISTING spec below with the new assets — keep existing palette entries and rules unless the new assets clearly contradict or extend them. A few new samples must NOT shrink or replace the established spec.\nEXISTING palette: ${t.palette.join(" ")}\nEXISTING rules: ${JSON.stringify(t.aiRules)}\nEXISTING coreMJ: ${t.coreMJ}\nEXISTING coreHF: ${t.coreHF}`
+    : "\nFRESH MODE: define the spec purely from the uploaded assets (ignore any previous spec).";
+  const sysMsg = `You are a design-system analyst. From the uploaded icon assets, extract the visual mood and produce an updated master prompt set for image generation.${mergeBlock}
 Constraints:
 - "coreMJ": must start with ", " and end with "--ar 1:1 --v 8.1 --style raw --s 50 --no outline, gradient, shadow, 3d, texture, text, watermark, background scene" (adjust only if the observed style truly requires)
 - "coreHF": must start with ", " — plain-language version, no -- parameters
@@ -1364,7 +1442,7 @@ document.getElementById("mood-run").addEventListener("click", async () => {
       if (/\.svg$/i.test(f.name)) svgTexts.push(await f.text());
       else pngPalettes.push(...(await pngDominantColors(f)));
     }
-    const j = await analyzeMood(svgTexts, [...new Set(pngPalettes)].slice(0, 12), model);
+    const j = await analyzeMood(svgTexts, [...new Set(pngPalettes)].slice(0, 12), model, document.getElementById("mood-merge").checked);
     moodProposal = j;
     tMj.value = j.coreMJ;
     tHf.value = j.coreHF;
