@@ -466,14 +466,46 @@
         </ol>
       </div>
       <div class="g-block">
-        <h4>완성도 검증 체크리스트 (QA 6항목)</h4>
+        <h4>도구별 프롬프트 3안 (2026.07 기준) — {주제}만 치환해 사용</h4>
+        <div class="gp-label">안 1 · GPT Image 2 — 대량 자동화 추천 ⭐ (레퍼 최대 16장 · background=transparent 지원)
+          <button class="re" id="tpl-copy-gpt" style="margin-left:8px">복사</button></div>
+        <div class="prompt-box" id="tpl-gpt" style="max-height:180px;white-space:pre-wrap">Goal: add one new icon to an existing flat icon set.
+References: Images 1–4 are icons from the set. Match their art style exactly.
+Subject: {주제} — a single object.
+Style rules (must not change): flat vector, solid fill shapes only, no outlines or strokes, fully rounded corners and caps, chunky simple silhouette, no gradients, no shadows, no texture, no text.
+Color rules: one dominant color — choose one of #05A9E3 blue, #F2C500 yellow, #8BC02F lime, #F59D00 orange, #42A141 green. Secondary parts (handles, legs, straps) in #EBEBEB light gray. Tiny accents only in #E94B35 red.
+Composition: single object centered, about 10% margin, transparent background, square 1:1.</div>
+        <div class="gp-label">안 2 · 미드저니 V8.1 — 미감·완성도 추천 (sref 300~500 또는 무드보드 프로필)
+          <button class="re" id="tpl-copy-mj" style="margin-left:8px">복사</button></div>
+        <div class="prompt-box" id="tpl-mj" style="max-height:150px;white-space:pre-wrap">flat vector icon of {주제}, solid rounded fill shapes, no outline, one dominant color with light gray #EBEBEB secondary parts, minimal chunky silhouette, flat design, plain white background --sref [레퍼런스 URL1] [URL2] [URL3] --sw 400 --style raw --no outline, gradient, shadow, 3d, texture, text, background scene --ar 1:1</div>
+        <div class="gp-label">안 3 · Nano Banana 2 (Gemini 3 Flash Image) — 대화형 반복 수정 추천
+          <button class="re" id="tpl-copy-nano" style="margin-left:8px">복사</button></div>
+        <div class="prompt-box" id="tpl-nano" style="max-height:160px;white-space:pre-wrap">Use the attached images (Image A–D) strictly as the art style reference — they are icons from my existing flat icon set.
+Create a new icon of {주제} in exactly the same style: flat vector look, solid fill shapes with no outlines, fully rounded corners, chunky simple silhouette, no gradients, no shadows, no text.
+One dominant color from: #05A9E3, #F2C500, #8BC02F, #F59D00, #42A141. Secondary parts in #EBEBEB light gray, tiny #E94B35 red accents only.
+Single object centered on a plain white background, square, ~10% margin.</div>
+        <div class="gp-label">LLM에게 SVG 코드 직접 요청 시 (32×32)
+          <button class="re" id="tpl-copy-svg" style="margin-left:8px">복사</button></div>
+        <div class="prompt-box" id="tpl-svg" style="max-height:160px;white-space:pre-wrap">아래 규칙으로 "{주제}" SVG 아이콘을 만들어줘.
+- viewBox="0 0 32 32", 배경 없음
+- stroke 없이 fill 도형만 사용 (선이 필요하면 rx 있는 rect나 굵은 path fill로)
+- 모든 모서리 라운드 (rx ≥ 1.5), 선 끝은 둥글게
+- 메인 컬러 1개: #05A9E3 / #42A141 / #8BC02F / #F2C500 / #F59D00 중 택1
+- 보조: #EBEBEB, #BEBEBE / 포인트(소량): #E94B35
+- 실루엣은 단순하고 통통하게, 디테일 최소화 (도형 3~7개)
+- 캔버스 여백 약 8~10%</div>
+        <div class="api-note" style="margin-top:8px">공통 팁: 스타일 문구는 한 글자도 바꾸지 말고 {주제}만 치환 · 주제는 영어 명사 1~2단어 · 잘 나온 결과물을 레퍼런스 풀에 계속 추가(세트가 커질수록 안정화) · 여러 개 연속 생성 시 "메인 컬러를 블루→옐로→그린→오렌지 순으로 순환" 지시로 세트 색 밸런스 유지</div>
+      </div>
+      <div class="g-block">
+        <h4>완성도 검증 체크리스트 (QA)</h4>
         <ul>
-          <li>외곽선 없음 — 실루엣이 솔리드 필로만 구성</li>
+          <li>외곽선(stroke) 없음 — 실루엣이 솔리드 필로만 구성</li>
           <li>그라디언트 · 그림자 · 질감 없음</li>
-          <li>색상 2~3개 + 하이라이트 그레이(#EBEBEB), 공식 팔레트 근접</li>
+          <li>팔레트 외 색 없음 · <b>메인 컬러 1색</b> + 그레이 보조 + 포인트 소량 (버거·피자 등 다색 소재만 예외)</li>
           <li>디테일은 굵은 라운드 스트로크 2~3개 이하</li>
           <li>모든 모서리 · 선 끝 라운드 처리</li>
-          <li>순백 배경, 오브젝트 프레임 85% 이상 점유</li>
+          <li>배경 없음(투명/순백), 중앙 배치 · 여백 약 10%</li>
+          <li>기존 세트 옆에 놓았을 때 이질감이 없는가</li>
         </ul>
       </div>
     </div>
@@ -492,6 +524,14 @@
         <label for="t-select">테마 선택</label>
         <select id="t-select" style="flex:1;min-width:220px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line-2);border-radius:9px;padding:9px 12px;font-size:13px;font-weight:700;font-family:inherit"></select>
         <span class="badge" id="t-draft" style="display:none;border-color:var(--warn);color:var(--warn)">추정 초안 — 원본 자산 확보 시 정밀 추출 필요</span>
+      </div>
+      <div class="g-block">
+        <h4>무드 삽입 — 새 그래픽으로 마스터 프롬프트 업데이트</h4>
+        <div class="api-row">
+          <input type="file" id="mood-files" multiple accept=".svg,image/png,image/jpeg" style="flex:1;min-width:200px;color:var(--ink-2);font-size:12px">
+          <button class="re" id="mood-run">분석 & 제안받기</button>
+        </div>
+        <div class="api-note" id="mood-status">디자인팀 아이콘(SVG 권장 · PNG는 팔레트만 분석)을 올리면 AI가 무드를 분석해 아래 팔레트·마스터 프롬프트 초안을 채워줘요. 검토·수정 후 [저장]하면 적용됩니다. 피그마에서는 Export → SVG로 내보내 업로드하세요.</div>
       </div>
       <div class="g-block"><h4>팔레트</h4><div class="chips" id="t-palette"></div></div>
       <div class="g-block"><h4>미드저니 마스터 프롬프트 (편집 가능)</h4><textarea id="t-mj" class="t-area" spellcheck="false"></textarea></div>
@@ -912,10 +952,11 @@ function buildGuideSystem() {
   return `You are a prompt engineer for a flat icon design system whose mood was learned from 75 verified reference graphics.
 STYLE DNA (measured from the actual set):
 - Palette ONLY these hexes: ${t.palette.join(" ")}
-- 2-3 colors per icon (max 5); about 4 chunky shapes per icon — extremely minimal
+- Color assignment rule: ONE dominant main color (60-80% of area — pick from #05A9E3 #F2C500 #8BC02F #F59D00 #42A141), neutral #EBEBEB/#BEBEBE for secondary parts (handles, legs, straps), tiny #E94B35/brown accents only. Multi-color only for inherently multi-color subjects (burger, pizza)
+- About 4 chunky shapes per icon — extremely minimal (max 5 colors even in exceptions)
 - Blunt rounded tips everywhere; shapes are plump rounded custom paths (almost no rectangles)
 - Details are 1-3 thick light-gray #EBEBEB rounded filled marks/dots (shine marks, seeds, dashes)
-- 45-degree diagonal tilt is common for dynamic subjects; pure white background
+- 45-degree diagonal tilt is common for dynamic subjects; pure white background, ~10% margin
 VERIFIED EXAMPLES from the set (follow this exact voice):
 ${examples}
 TASK: given a subject, write ONE subject body following the same formula, under 50 words, English:
@@ -1211,15 +1252,145 @@ tSel.addEventListener("change", () => {
   showToast(`${getTheme().name} 적용됨`);
 });
 document.getElementById("t-save").addEventListener("click", () => {
-  localStorage.setItem(themeOvrKey(getThemeId()), JSON.stringify({ coreMJ: tMj.value, coreHF: tHf.value }));
+  const ovr = { coreMJ: tMj.value, coreHF: tHf.value };
+  if (moodProposal) {
+    if (Array.isArray(moodProposal.palette) && moodProposal.palette.length) ovr.palette = moodProposal.palette;
+    if (Array.isArray(moodProposal.styleRules) && moodProposal.styleRules.length) ovr.aiRules = moodProposal.styleRules;
+  }
+  localStorage.setItem(themeOvrKey(getThemeId()), JSON.stringify(ovr));
+  moodProposal = null;
   refreshThemeUI();
-  showToast("마스터 프롬프트를 저장했어요 (이 브라우저 전용)");
+  showToast("마스터 프롬프트를 저장했어요 — 이후 가이드 생성이 이 무드를 따라가요");
 });
 document.getElementById("t-reset").addEventListener("click", () => {
   localStorage.removeItem(themeOvrKey(getThemeId()));
+  moodProposal = null;
   refreshThemeUI();
   showToast("기본값으로 복원했어요");
 });
+
+/* ── 무드 삽입: 업로드 자산 분석 → LLM이 마스터 프롬프트 제안 ── */
+let moodProposal = null;
+
+function pngDominantColors(file) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const s = 64;
+      const c = document.createElement("canvas");
+      c.width = s; c.height = s;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(img, 0, 0, s, s);
+      const data = ctx.getImageData(0, 0, s, s).data;
+      const buckets = {};
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 128) continue; // 투명 제외
+        const r = data[i] & 0xF0, g = data[i + 1] & 0xF0, b = data[i + 2] & 0xF0;
+        if (r >= 0xF0 && g >= 0xF0 && b >= 0xF0) continue; // 흰 배경 제외
+        const k = `${r},${g},${b}`;
+        buckets[k] = (buckets[k] || 0) + 1;
+      }
+      const top = Object.entries(buckets).sort((a, b) => b[1] - a[1]).slice(0, 6)
+        .map(([k]) => "#" + k.split(",").map((v) => (Number(v) + 8).toString(16).padStart(2, "0")).join("").toUpperCase());
+      resolve(top);
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => resolve([]);
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function svgMoodStats(svgTexts) {
+  const colors = {};
+  let elems = 0;
+  svgTexts.forEach((s) => {
+    (s.match(/(?:fill|stroke)="#[0-9A-Fa-f]{6}"/g) || []).forEach((m) => {
+      const c = m.slice(-8, -1).toUpperCase();
+      colors[c] = (colors[c] || 0) + 1;
+    });
+    elems += (s.match(/<(?:path|rect|circle|ellipse|polygon|line|polyline)\b/g) || []).length;
+  });
+  return {
+    colorFreq: Object.entries(colors).sort((a, b) => b[1] - a[1]).slice(0, 16),
+    avgElems: svgTexts.length ? Number((elems / svgTexts.length).toFixed(1)) : 0,
+    svgCount: svgTexts.length,
+  };
+}
+
+async function analyzeMood(svgTexts, pngPalettes, model) {
+  const stats = svgMoodStats(svgTexts);
+  const samples = svgTexts.slice(0, 6).map((s, i) => `--- sample ${i + 1} ---\n${s.slice(0, 1400)}`).join("\n");
+  const sysMsg = `You are a design-system analyst. From the uploaded icon assets, extract the visual mood and produce an updated master prompt set for image generation.
+Constraints:
+- "coreMJ": must start with ", " and end with "--ar 1:1 --v 8.1 --style raw --s 50 --no outline, gradient, shadow, 3d, texture, text, watermark, background scene" (adjust only if the observed style truly requires)
+- "coreHF": must start with ", " — plain-language version, no -- parameters
+- "palette": 8-14 hex colors actually observed (uppercase), most-used first
+- "styleRules": 3-5 short English rules — shape language, detail conventions, and the color-assignment rule (e.g. one dominant color + neutral gray secondary + tiny accent)
+- "note": 한국어 2문장 — 관찰된 무드 요약 + 기존과 달라진 점
+Return ONLY JSON: {"palette": [...], "styleRules": [...], "coreMJ": "...", "coreHF": "...", "note": "..."}`;
+  const userMsg = `SVG stats: ${JSON.stringify(stats)}\nPNG dominant colors: ${JSON.stringify(pngPalettes)}\nSVG sources:\n${samples || "(none — raster only)"}`;
+  const key = getApiKey();
+  const headers = { "Content-Type": "application/json" };
+  if (key) headers["Authorization"] = `Bearer ${key}`;
+  const resp = await fetch(`${getRouterBase()}/chat/completions`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model,
+      messages: [{ role: "system", content: sysMsg }, { role: "user", content: userMsg }],
+      max_completion_tokens: 1200,
+    }),
+  });
+  if (resp.status === 401) throw new Error("401 — API 키를 확인하세요");
+  if (!resp.ok) throw new Error(`라우터 오류 HTTP ${resp.status}`);
+  const data = await resp.json();
+  const content = data?.choices?.[0]?.message?.content || "";
+  const j = JSON.parse(content.slice(content.indexOf("{"), content.lastIndexOf("}") + 1));
+  if (!j.coreMJ || !j.coreHF || !Array.isArray(j.palette)) throw new Error("제안 형식이 올바르지 않아요 — 다시 시도해 보세요");
+  return j;
+}
+
+document.getElementById("mood-run").addEventListener("click", async () => {
+  const files = [...(document.getElementById("mood-files").files || [])].slice(0, 20);
+  const status = document.getElementById("mood-status");
+  if (!files.length) { status.textContent = "파일을 먼저 선택하세요 (SVG 권장 · 최대 20개)"; return; }
+  if (!getApiKey() && !isLocalProxy()) { apiPanel.classList.add("open"); showToast("API 키가 필요해요"); return; }
+  const model = modelSel.value !== "local" ? modelSel.value : "claude-sonnet-5";
+  status.textContent = `분석 중… (${files.length}개 파일 · ${model})`;
+  try {
+    const svgTexts = [];
+    const pngPalettes = [];
+    for (const f of files) {
+      if (/\.svg$/i.test(f.name)) svgTexts.push(await f.text());
+      else pngPalettes.push(...(await pngDominantColors(f)));
+    }
+    const j = await analyzeMood(svgTexts, [...new Set(pngPalettes)].slice(0, 12), model);
+    moodProposal = j;
+    tMj.value = j.coreMJ;
+    tHf.value = j.coreHF;
+    const pal = document.getElementById("t-palette");
+    pal.innerHTML = "";
+    j.palette.forEach((hex) => {
+      const c = document.createElement("button");
+      c.className = "chip";
+      c.innerHTML = `<b style="background:${hex}"></b>${hex}`;
+      c.addEventListener("click", () => copyText(hex, `${hex} 복사했어요`));
+      pal.appendChild(c);
+    });
+    status.innerHTML = `💡 ${j.note || "제안 완료"} — 아래 초안을 검토·수정한 뒤 <b>[저장]</b>을 누르면 팔레트·규칙까지 함께 적용돼요.`;
+  } catch (e) {
+    status.textContent = e?.message?.includes("Failed to fetch")
+      ? "라우터 연결 실패 — 로컬 실행기(proxy.py) 확인"
+      : (e?.message || "분석 실패");
+  }
+});
+
+/* 도구별 템플릿 복사 버튼 */
+[["tpl-copy-gpt", "tpl-gpt"], ["tpl-copy-mj", "tpl-mj"], ["tpl-copy-nano", "tpl-nano"], ["tpl-copy-svg", "tpl-svg"]].forEach(([btnId, boxId]) => {
+  const b = document.getElementById(btnId);
+  if (b) b.addEventListener("click", () => copyText(document.getElementById(boxId).textContent.trim(), "템플릿을 복사했어요 — {주제}만 바꿔 쓰세요"));
+});
+
 refreshThemeUI();
 
 renderTabs();

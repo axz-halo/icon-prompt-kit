@@ -13,7 +13,8 @@ window.DGG_THEMES = {
     coreHF: window.DGG_DATA.CORE_HF,
     aiRules: [
       "Flat vector only: solid fills, NO gradients, NO shadows, NO outlines/borders, NO text",
-      "Chunky rounded blob shapes; every stroke uses stroke-linecap=\"round\"; 2-3 colors per icon",
+      "Chunky rounded blob shapes; every stroke uses stroke-linecap=\"round\"",
+      "Color assignment: ONE dominant color (60-80% of area) + neutral gray #EBEBEB/#BEBEBE for secondary parts (handles, legs, straps) + tiny #E94B35 red or brown accents only — multi-color exception for inherently multi-color subjects (burger, pizza)",
       "Small details drawn as thick light-gray #EBEBEB rounded strokes or dots (2-3 details max)",
       "Keep under 20 elements per SVG — reference set averages just 4 shapes per icon",
     ],
