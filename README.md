@@ -2,8 +2,10 @@
 
 디자인팀 기초 그래픽(75종) 무드를 유지하며 아이콘을 검색·생성·아카이빙하는 도구.
 
-- 갤러리(웹): https://pages.github.kakaocorp.com/halo-axz/icon-prompt-kit/ (사내) · https://axz-halo.github.io/icon-prompt-kit/ (공개 미러)
-- **AI 생성은 로컬 실행이 필요합니다** — timely 라우터가 아직 브라우저 직접 호출(CORS)을 허용하지 않아서입니다.
+- **정식 배포(AI 포함 완전체): https://icon-prompt-kit.vercel.app** — 서버리스 프록시가 내장되어
+  URL만 열면 키 입력 없이 AI 프롬프트 가이드까지 동작합니다 (키는 Vercel 환경변수).
+- 미러: https://pages.github.kakaocorp.com/halo-axz/icon-prompt-kit/ (사내) · https://axz-halo.github.io/icon-prompt-kit/ (공개)
+  — GitHub Pages는 정적 호스팅이라 AI 기능만 제외되고 동작(라우터 CORS 미허용), 로컬 실행기(proxy.py)로 대체 가능.
 
 ## 팀원 시작하기 (macOS, 3단계)
 
