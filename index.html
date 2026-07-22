@@ -717,11 +717,23 @@ const getRouterBase = () => {
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return `${location.origin}/v1`;
   return DEFAULT_ROUTER_BASE;
 };
+// 2026-07-16 실측 벤치마크(돛단배 SVG 동일 요청) 기준 추천 순 정렬
+// opus-4-8: 무드·규격 최상, 6s · sonnet-4-6: 정확하나 디테일 얇음 · gpt-5.4: 규격 통과, 무드 이탈
+// gemini-3.5-flash/deepseek-v4-pro: SVG 출력 실패 → 아이콘 용도 비추천 표시
 const AI_MODELS = [
-  "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5",
-  "gemini-3.5-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite",
-  "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano",
-  "deepseek-v4-pro", "deepseek-chat",
+  { id: "claude-opus-4-8", label: "claude-opus-4-8 ⭐ 추천" },
+  { id: "claude-sonnet-4-6", label: "claude-sonnet-4-6 ⭐" },
+  { id: "claude-haiku-4-5", label: "claude-haiku-4-5 (빠름·품질↓)" },
+  { id: "claude-opus-4-7", label: "claude-opus-4-7" },
+  { id: "claude-opus-4-6", label: "claude-opus-4-6" },
+  { id: "gpt-5.4", label: "gpt-5.4" },
+  { id: "gpt-5.4-mini", label: "gpt-5.4-mini" },
+  { id: "gpt-5.4-nano", label: "gpt-5.4-nano" },
+  { id: "gemini-3.5-flash", label: "gemini-3.5-flash (SVG 불안정)" },
+  { id: "gemini-3.1-pro-preview", label: "gemini-3.1-pro-preview" },
+  { id: "gemini-3.1-flash-lite", label: "gemini-3.1-flash-lite" },
+  { id: "deepseek-v4-pro", label: "deepseek-v4-pro (SVG 불안정)" },
+  { id: "deepseek-chat", label: "deepseek-chat" },
 ];
 const KEY_STORE = "dgg-timely-key";
 const MOCK_STORE = "dgg-timely-mock";
@@ -730,7 +742,7 @@ const MODEL_STORE = "dgg-timely-model";
 const modelSel = document.getElementById("gen-model");
 modelSel.innerHTML =
   `<option value="local">로컬 엔진 (기본)</option>` +
-  AI_MODELS.map((m) => `<option value="${m}">AI · ${m}</option>`).join("");
+  AI_MODELS.map((m) => `<option value="${m.id}">AI · ${m.label}</option>`).join("");
 modelSel.value = localStorage.getItem(MODEL_STORE) || "local";
 modelSel.addEventListener("change", () => {
   localStorage.setItem(MODEL_STORE, modelSel.value);
