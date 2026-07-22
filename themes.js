@@ -24,7 +24,7 @@ window.DGG_THEMES = {
     draft: true, // 공개 아티클 기반 추정 — 원본 자산 확보 시 정밀 추출로 교체
     localEngine: false,
     palette: ["#3182F6", "#1B64DA", "#4593FC", "#B0D3FF", "#E8F1FF", "#FFD331", "#FFA938", "#FF6B6B", "#17DA85", "#0E1B2C", "#FFFFFF"],
-    coreMJ: ", soft 3D rendered icon, smooth rounded plastic-like geometry, matte material with subtle gradients, gentle studio lighting from upper left, slight three-quarter isometric view, minimal Korean fintech app illustration style, single floating object, isolated on pure white background, centered, fills the frame --ar 1:1 --style raw --s 100 --no outline, text, watermark, photo, realistic, hands, background objects",
+    coreMJ: ", soft 3D rendered icon, smooth rounded plastic-like geometry, matte material with subtle gradients, gentle studio lighting from upper left, slight three-quarter isometric view, minimal Korean fintech app illustration style, single floating object, isolated on pure white background, centered, fills the frame --ar 1:1 --v 7 --style raw --s 100 --no outline, text, watermark, photo, realistic, hands, background objects",
     coreHF: ", rendered as a soft 3D icon: smooth rounded geometry, matte plastic material, subtle gradients allowed, gentle upper-left studio lighting, slight three-quarter view, clean minimal fintech illustration, single floating object on a pure white empty background, subject centered and filling the frame",
     aiRules: [
       "Soft-3D look faked in flat SVG: rounded geometry, each surface split into 2-3 tints of the same hue to suggest gentle top-left lighting",

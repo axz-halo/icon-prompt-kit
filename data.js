@@ -1,7 +1,7 @@
 // Daum Graphic Generator — 아이콘 프롬프트 데이터 (실물 이미지 전수 검증 기준)
 // png: 원본 PNG(파일명 셔플 보정 매핑) · svg: 원본/제작 SVG (Food는 SVG만 정명이라 매핑이 다름)
 window.DGG_DATA = {
-  "CORE_MJ": ", solid flat fills, two-tone color blocking, chunky rounded blob shapes, fully rounded line caps, small details cut out as thick light-gray #EBEBEB rounded strokes, minimal flat icon set style, isolated on pure white background, centered, fills the frame --ar 1:1 --style raw --s 50 --no outline, gradient, shadow, 3d, texture, text, watermark",
+  "CORE_MJ": ", solid flat fills, two-tone color blocking, chunky rounded blob shapes, fully rounded line caps, small details cut out as thick light-gray #EBEBEB rounded strokes, minimal flat icon set style, isolated on pure white background, centered, fills the frame --ar 1:1 --v 7 --style raw --s 50 --no outline, gradient, shadow, 3d, texture, text, watermark",
   "CORE_HF": ", drawn as a simple flat vector icon: solid flat fills only, two or three colors, chunky rounded blob shapes with fully rounded line caps, small details cut out as thick light-gray rounded strokes, absolutely no outlines, no gradients, no shadows, no 3D, pure white empty background, subject centered and filling the frame",
   "SETS": [
     {
