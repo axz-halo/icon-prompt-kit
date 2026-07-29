@@ -136,6 +136,7 @@
 </div>
 <div id="toast" role="status"></div>
 
+<script src="../engine.js"></script>
 <script>
 /* ─────────── 상태(프로토타입: localStorage가 서버 DB 역할) ─────────── */
 const KEY = "dgs-proto-v1";
@@ -175,21 +176,27 @@ function toast(m) { const t = document.getElementById("toast"); t.textContent = 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const fmt = (ts) => new Date(ts).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 
-/* ─────────── 데모 아이콘 렌더 (스펙 팔레트를 실제로 반영) ─────────── */
+/* ─────────── 아이콘 렌더: 실제 생성 엔진(engine.js 모티프 26종) 사용 ─────────── */
 function demoSvg(subject, palette, i) {
+  // 실제 엔진이 로드되면 주제에 맞는 형태로 생성 (자전거→자전거, 커피→커피)
+  if (window.DGG_ENGINE) {
+    const seedNum = (window.DGG_ENGINE.hash(subject) + i * 7919) >>> 0;
+    return window.DGG_ENGINE.generate(subject, seedNum).svg;
+  }
+  // 엔진 미로드 시 폴백 (팔레트만 반영한 최소 도형)
   let h = 0; for (const ch of subject + i) h = (h * 31 + ch.charCodeAt(0)) % 99991;
   const main = palette[h % Math.min(palette.length, 5)];
   const gray = palette.find((c) => c.toUpperCase() === "#EBEBEB") || "#EBEBEB";
-  const shapes = [
-    `<circle cx="256" cy="268" r="150" fill="${main}"/>`,
-    `<rect x="110" y="140" width="292" height="250" rx="60" fill="${main}"/>`,
-    `<path d="M256 96 C 372 176 396 268 372 336 C 348 408 300 440 256 440 C 212 440 164 408 140 336 C 116 268 140 176 256 96 Z" fill="${main}"/>`,
-  ];
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-    ${shapes[h % 3]}
+    <circle cx="256" cy="268" r="150" fill="${main}"/>
     <path d="M196 208 q-18 34 4 66" fill="none" stroke="${gray}" stroke-width="26" stroke-linecap="round"/>
-    <circle cx="316" cy="300" r="15" fill="${gray}"/>
   </svg>`;
+}
+/* 엔진이 인식한 주제인지 (모티프 매칭 여부) */
+function motifOf(subject) {
+  if (!window.DGG_ENGINE) return null;
+  const r = window.DGG_ENGINE.resolve(subject);
+  return r.type === "motif" ? r.id : null;
 }
 const svgUrl = (s) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(s)}`;
 
@@ -270,9 +277,13 @@ function bindGen() {
       return { svg, kw, qa: lint(svg, s) };
     });
     DB.events.generated += 4; save();
+    const mo = motifOf(kw);
     document.getElementById("g-out").innerHTML = `
       <div class="card">
         <h3>“${esc(kw)}” 결과 — 가이드 ${s.version} · 자동 QA 적용</h3>
+        <div class="note" style="margin:-4px 0 12px">${mo
+          ? `✓ 주제 인식됨 (${mo}) — 형태까지 생성됐어요`
+          : `미등록 주제 — 무드 스케치로 대체됐어요. 실제 제품에서는 이 경우 AI 이미지 생성으로 넘어갑니다.`}</div>
         <div class="grid4">
           ${genResults.map((r, i) => `
             <div class="tile">
